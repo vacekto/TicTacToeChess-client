@@ -1,0 +1,33 @@
+.Options {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+
+    .gameList {
+        display: flex;
+        width: 80%;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        gap: 30px;
+
+        div {
+            cursor: pointer;
+            width: 150px;
+            height: 150px;
+            border: solid 5px aqua;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    }
+
+    .gameOptionsContainer {
+        .gameOptions {
+            div {
+                cursor: pointer;
+            }
+        }
+    }
+}
