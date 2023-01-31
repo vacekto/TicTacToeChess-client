@@ -1,6 +1,7 @@
 import './App.scss';
-import Menu from './pages/Menu';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Menu from './pages/Menu';
+import TicTacToe from './pages/TicTacToe';
 
 function App() {
 
@@ -9,7 +10,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route index element={<Menu />} />
-          <Route path='/TicTacToe' />
+          <Route path='/TicTacToe' element={<TicTacToe />} />
         </Routes>
       </BrowserRouter>
     </div>
