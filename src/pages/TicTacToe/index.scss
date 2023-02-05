@@ -1,43 +1,50 @@
-@import '../../util//CSS/constants.scss';
+@import '@/util/CSS/constants.scss';
 
 .TicTacToe {
     margin: auto;
+    display: flex;
     flex-direction: column;
-    border: 2px solid $base-color;
+    align-items: center;
+
+    border: 2px solid $neutral;
     padding: 50px;
-
-    .score {}
-
-    .circleContainer {
-        height: 100px;
-        svg{
-
-        }
-
-    }
 
     .board {
         position: relative;
-
-        .border {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            border: 1px solid white;
-            box-sizing: border-box;
-        }
 
         div {
             display: flex;
 
             div {
-                width: 20px;
-                height: 20px;
-                border-top: 1px solid #afafaf;
-                border-left: 1px solid #afafaf;
+                box-sizing: border-box;
+                width: 30px;
+                height: 30px;
+                border-top: 1px solid #dcdcdc;
+                border-left: 1px solid #dcdcdc;
+
+                svg {
+                    circle {
+                        stroke: $light-player1;
+                    }
+
+                    line {
+                        stroke: $light-player2
+                    }
+                }
             }
         }
     }
+}
 
-    .options {}
+#dark {
+    .TicTacToe {
+
+        circle {
+            stroke: $dark-player1;
+        }
+
+        line {
+            stroke: $dark-player2;
+        }
+    }
 }

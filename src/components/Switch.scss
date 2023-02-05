@@ -1,0 +1,111 @@
+@import '@/util/CSS/constants.scss';
+
+$height: 25px;
+$width: 55px;
+$icon-padding: 1px;
+$indicator-overflow: 5px;
+$indicator-color: rgba(156, 156, 156, 0.37);
+$left-icon-light: $light-player1;
+$right-icon-light: $light-player2;
+$left-icon-dark: $dark-player1;
+$right-icon-dark: $dark-player2;
+$border-light: #a4b5b844;
+
+.flexEnd {
+    justify-content: flex-end;
+}
+
+.flexStart {
+    justify-content: flex-start;
+}
+
+.Switch {
+    margin: 20px;
+    width: $width;
+    height: $height;
+    border: 1px solid $border-light;
+    display: flex;
+    align-items: center;
+    border-radius: $height;
+    position: relative;
+    padding: 0 1px;
+
+    .icons {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: space-between;
+
+
+        .iconContainer {
+            height: 100%;
+            width: $height;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 15;
+        }
+
+        .left {
+            svg {
+                padding: $icon-padding;
+                stroke: $light-player1;
+            }
+        }
+
+        .right {
+            svg {
+                padding: $icon-padding;
+                stroke: $light-player2;
+            }
+        }
+
+        .active {
+            svg {
+                stroke: white
+            }
+        }
+    }
+
+    .indicatorContainer {
+        position: absolute;
+        height: 100%;
+        width: $height;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        z-index: 10;
+
+        .indicator {
+            position: absolute;
+            margin: auto;
+            background-color: $indicator-color;
+            height: $height + $indicator-overflow;
+            width: $height + $indicator-overflow;
+            border-radius: 50%;
+
+        }
+
+        .left{
+            background-color: $light-player1;
+        }
+        .right{
+            background-color: $light-player2;
+        }
+
+    }
+}
+
+
+#dark {
+    .Switch {
+        .left {
+            stroke: $dark-player1;
+        }
+
+        .right {
+            stroke: red;
+        }
+    }
+}

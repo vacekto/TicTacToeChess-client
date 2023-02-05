@@ -29,6 +29,7 @@ const Options: React.FC<IOptionsProps> = (props) => {
                 <div className="gameOptions">
                     <div onClick={() => { navigate(`/${selectedGame}`) }}>Hetseat</div>
                     <div>Find opponent</div>
+                    <div>vs PC</div>
                     <div onClick={selectGame(null)}>Back to menu</div>
                 </div>
             </div>
