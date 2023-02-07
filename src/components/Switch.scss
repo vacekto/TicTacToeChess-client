@@ -20,7 +20,7 @@ $border-light: #a4b5b844;
 }
 
 .Switch {
-    margin: 20px;
+    margin: 30px 0px;
     width: $width;
     height: $height;
     border: 1px solid $border-light;
@@ -87,10 +87,11 @@ $border-light: #a4b5b844;
 
         }
 
-        .left{
+        .left {
             background-color: $light-player1;
         }
-        .right{
+
+        .right {
             background-color: $light-player2;
         }
 

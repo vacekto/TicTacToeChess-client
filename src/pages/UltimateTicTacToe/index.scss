@@ -1,1 +1,58 @@
-.UltimateTicTacToe {}
+@import '@/util/CSS/constants.scss';
+
+
+.UltimateTicTacToe {
+    margin: auto;
+    border: 1px solid black;
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .ultimateBoard {
+
+        .ultimateRow {
+            display: flex;
+            justify-content: space-between;
+
+            .ultimateSquare {
+                margin: 10px;
+                border: 1px solid orange;
+                border-radius: 10px;
+                padding: 15px;
+                position: relative;
+                box-sizing: content-box;
+
+                .squareDone {
+                    position: absolute;
+                    width: 93px;
+                    height: 93px;
+
+                    svg {
+                        stroke: blue;
+                    }
+                }
+
+                .row {
+                    display: flex;
+                    justify-content: space-between;
+
+                    .square {
+                        width: 30px;
+                        height: 30px;
+                        border-top: 1px solid black;
+                        border-left: 1px solid black;
+
+                        circle {
+                            stroke: $light-player1;
+                        }
+
+                        line {
+                            stroke: $light-player2
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
