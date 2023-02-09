@@ -1,16 +1,14 @@
-import './InGameScore.scss'
+import './TicTacToeScore.scss'
 import { TGameName } from 'shared';
-import CircleSVG from '@/components/svg/CircleSVG';
-import CrossSVG from '@/components/svg/CrossSVG';
-import Scales from '@/components/svg/ScalesSVG';
+import CircleSVG from '@/components/icons/CircleSVG';
+import CrossSVG from '@/components/icons/CrossSVG';
+import Scales from '@/components/icons/ScalesSVG';
 
 interface IInGameScoreProps {
     game: TGameName
 }
 
 const InGameScore: React.FC<IInGameScoreProps> = ({ game }) => {
-
-
 
     return <div className='InGameScore'>
         <div className='player1'>

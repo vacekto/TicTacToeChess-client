@@ -4,10 +4,10 @@ import { context } from '@/util/Context'
 import { useNavigate } from "react-router-dom";
 import { TTicTacToeState, initializeTicTacToeState, TTicTacToeSide } from 'shared'
 import InGameOptions from '@/components/InGameOptions';
-import InGameScore from '@/components/InGameScore';
+import InGameScore from '@/components/TicTacToeScore';
 import Switch from '@/components/Switch';
-import CircleSVG from '@/components/svg/CircleSVG';
-import CrossSVG from '@/components/svg/CrossSVG';
+import CircleSVG from '@/components/icons/CircleSVG';
+import CrossSVG from '@/components/icons/CrossSVG';
 
 
 interface ITicTacToeProps {

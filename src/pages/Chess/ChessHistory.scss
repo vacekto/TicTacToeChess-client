@@ -1,0 +1,22 @@
+.ChessHistory {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+
+    div {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background-color: #058e86;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        svg {
+            fill: white;
+            width: 40%;
+            height: 40%;
+        }
+    }
+}
