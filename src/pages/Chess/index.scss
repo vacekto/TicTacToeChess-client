@@ -2,18 +2,37 @@
     margin: auto;
     border: 1px solid black;
     padding: 50px;
-    .figuresTaken{
+
+    .figuresTaken {
         display: flex;
         justify-content: space-between;
-        height: 10px;
+        min-height: 10px;
         border: 1px solid black;
         margin-bottom: 10px;
+
+        div {
+            display: flex;
+            align-items: center;
+            max-width: 20%;
+            flex-wrap: wrap-reverse;
+            border: 1px solid orange;
+
+            img {
+                width: 15px;
+            }
+        }
+
+        .player2 {
+            flex-direction: row-reverse;
+        }
     }
+
     .board {
         border: 3px solid black;
+
         .row {
             display: flex;
-            
+
             .square {
                 box-sizing: border-box;
                 width: 50px;

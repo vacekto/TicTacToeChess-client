@@ -2,18 +2,15 @@ import './index.scss'
 import { initializeChessBoard, TChessState } from 'shared';
 import { CSSProperties, useState, useContext } from 'react';
 import { useNavigate } from "react-router-dom";
-import blackBishop from '@/util/svg/BlackBishop.svg'
+import blackBishop from './icons/svg/BlackBishop.svg'
 import { context } from '@/util/Context'
-
 import InGameOptions from '@/components/InGameOptions';
 import ChessHistory from './ChessHistory';
-
 
 const Chess: React.FC = () => {
     const [boardState, setBoardState] = useState<TChessState>(initializeChessBoard())
     const navigate = useNavigate();
     const { theme, setTheme } = useContext(context)
-
 
     const setSquareStyles = (x: number, y: number) => {
         const styles: CSSProperties = {}
@@ -28,11 +25,24 @@ const Chess: React.FC = () => {
     const resetCb = () => { setBoardState(initializeChessBoard()) }
     const lightModeCb = () => { setTheme(theme === 'dark' ? 'light' : 'dark') }
 
-
     return <div className='Chess'>
         <div className="figuresTaken">
-            <div className="player1"><img src={blackBishop} alt="" /></div>
-            <div className="player2">right</div>
+            <div className='player1'>
+                <img src={blackBishop} alt="" />
+                <img src={blackBishop} alt="" />
+                <img src={blackBishop} alt="" />
+                <img src={blackBishop} alt="" />
+                <img src={blackBishop} alt="" />
+                <img src={blackBishop} alt="" />
+            </div>
+            <div className='player2'>
+                <img src={blackBishop} alt="" />
+                <img src={blackBishop} alt="" />
+                <img src={blackBishop} alt="" />
+                <img src={blackBishop} alt="" />
+                <img src={blackBishop} alt="" />
+                <img src={blackBishop} alt="" />
+            </div>
         </div>
         <div className="board">
             {boardState.map((row, y) => {
