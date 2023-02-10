@@ -1,5 +1,5 @@
 import './index.scss'
-import { initializeUltimateTicTacToeState, TUltimateTicTacToeState, TTicTacToeSide } from 'shared';
+import { initializeUltimateTicTacToeBoard, TUltimateTicTacToeBoard, TTicTacToeSide } from 'shared';
 import { useState, useContext, CSSProperties, useEffect } from 'react'
 import { context } from '@/util/Context'
 import { useNavigate } from "react-router-dom";
@@ -9,18 +9,15 @@ import Switch from '@/components/Switch';
 import CircleSVG from '@/components/icons/CircleSVG';
 import CrossSVG from '@/components/icons/CrossSVG';
 
-interface IUltimateTicTacToeProps {
 
-}
-
-const UltimateTicTacToe: React.FC<IUltimateTicTacToeProps> = () => {
-    const [boardState, setBoardState] = useState<TUltimateTicTacToeState>(initializeUltimateTicTacToeState())
+const UltimateTicTacToe: React.FC = () => {
+    const [boardState, setBoardState] = useState<TUltimateTicTacToeBoard>(initializeUltimateTicTacToeBoard())
     const [isPlaying, setIsPlaying] = useState<TTicTacToeSide>('O')
     const navigate = useNavigate();
     const { theme, setTheme } = useContext(context)
 
     const homeCb = () => { navigate('/') }
-    const resetCb = () => { setBoardState(initializeUltimateTicTacToeState()) }
+    const resetCb = () => { setBoardState(initializeUltimateTicTacToeBoard()) }
     const lightModeCb = () => { setTheme(theme === 'dark' ? 'light' : 'dark') }
 
     const setSquareStyles = (x: number, y: number) => {

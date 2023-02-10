@@ -1,8 +1,8 @@
 import './index.scss'
-import { useState, CSSProperties, useContext } from 'react'
+import { useState, CSSProperties, useContext, useEffect } from 'react'
 import { context } from '@/util/Context'
 import { useNavigate } from "react-router-dom";
-import { TTicTacToeState, initializeTicTacToeState, TTicTacToeSide } from 'shared'
+import { TTicTacToeBoard, initializeTicTacToeBoard, TTicTacToeSide, checkForWinnerTicTacToe } from 'shared'
 import InGameOptions from '@/components/InGameOptions';
 import InGameScore from '@/components/TicTacToeScore';
 import Switch from '@/components/Switch';
@@ -16,16 +16,17 @@ interface ITicTacToeProps {
 
 const TicTacToe: React.FC<ITicTacToeProps> = () => {
 
-  const [boardState, setBoardState] = useState<TTicTacToeState>(initializeTicTacToeState(12))
+  const [boardState, setBoardState] = useState<TTicTacToeBoard>(initializeTicTacToeBoard(12))
   const [isPlaying, setIsPlaying] = useState<TTicTacToeSide>('O')
   const navigate = useNavigate();
 
   const { theme, setTheme } = useContext(context)
 
   const handleClick = (x: number, y: number) => () => {
-    if (boardState[y][x]) return
+    if (boardState[x][y]) return
     setBoardState(prevState => {
-      prevState[y][x] = isPlaying
+      prevState[x][y] = isPlaying
+      console.log(checkForWinnerTicTacToe(prevState, [x, y], 5))
       return prevState
     })
     setIsPlaying(prevState => prevState === 'O' ? 'X' : 'O')
@@ -45,17 +46,15 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
   }
 
   const homeCb = () => { navigate('/') }
-  const resetCb = () => { setBoardState(initializeTicTacToeState(9)) }
+  const resetCb = () => { setBoardState(initializeTicTacToeBoard(9)) }
   const lightModeCb = () => { setTheme(theme === 'dark' ? 'light' : 'dark') }
-
-
 
   return <div className='TicTacToe'>
     <InGameScore game='TicTacToe' />
     <div className="board">
-      {boardState.map((row, y) => <div key={y}>
-        {row.map((square, x) => <div
-          key={x}
+      {boardState.map((column, x) => <div key={x}>
+        {column.map((square, y) => <div
+          key={y}
           onClick={handleClick(x, y)}
           style={setSquareStyles(x, y)}
         >
