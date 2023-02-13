@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useContext } from 'react'
 import Menu from './pages/Menu';
 import TicTacToe from './pages/TicTacToe';
-import UltimateTicTacToe from './pages/UltimateTicTacToe';
+import UTicTacToe from './pages/UTicTacToe';
 import { useEffect, useRef } from 'react';
 import registerDragToScroll from './util/functions/dragToScroll'
 import { context } from './util/Context';
@@ -23,7 +23,7 @@ function App() {
         <Routes>
           <Route index element={<Menu />} />
           <Route path='/TicTacToe' element={<TicTacToe />} />
-          <Route path='/UltimateTicTacToe' element={<UltimateTicTacToe />} />
+          <Route path='/UTicTacToe' element={<UTicTacToe />} />
           <Route path='/Chess' element={<Chess />} />
         </Routes>
       </BrowserRouter>

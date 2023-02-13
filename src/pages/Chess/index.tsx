@@ -1,5 +1,5 @@
 import './index.scss'
-import { initializeChessBoard, TChessState } from 'shared';
+import { initChessBoard, TChessState } from 'shared';
 import { CSSProperties, useState, useContext } from 'react';
 import { useNavigate } from "react-router-dom";
 import blackBishop from './icons/svg/BlackBishop.svg'
@@ -8,7 +8,7 @@ import InGameOptions from '@/components/InGameOptions';
 import ChessHistory from './ChessHistory';
 
 const Chess: React.FC = () => {
-    const [boardState, setBoardState] = useState<TChessState>(initializeChessBoard())
+    const [boardState, setBoardState] = useState<TChessState>(initChessBoard())
     const navigate = useNavigate();
     const { theme, setTheme } = useContext(context)
 
@@ -22,7 +22,7 @@ const Chess: React.FC = () => {
     }
 
     const homeCb = () => { navigate('/') }
-    const resetCb = () => { setBoardState(initializeChessBoard()) }
+    const resetCb = () => { setBoardState(initChessBoard()) }
     const lightModeCb = () => { setTheme(theme === 'dark' ? 'light' : 'dark') }
 
     return <div className='Chess'>

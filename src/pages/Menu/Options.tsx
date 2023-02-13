@@ -2,7 +2,7 @@ import './Options.scss'
 import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 
-type TGameName = 'TicTacToe' | 'UltimateTicTacToe' | 'Chess'
+type TGameName = 'TicTacToe' | 'UTicTacToe' | 'Chess'
 
 interface IOptionsProps {
 
@@ -20,7 +20,7 @@ const Options: React.FC<IOptionsProps> = (props) => {
         {!selectedGame ?
             <div className="gameList">
                 <div onClick={selectGame('TicTacToe')}>TicTacToe</div>
-                <div onClick={selectGame('UltimateTicTacToe')}>Ultimate TicTacToe</div>
+                <div onClick={selectGame('UTicTacToe')}>Ultimate TicTacToe</div>
                 <div onClick={selectGame('Chess')}>Chess</div>
             </div>
             :

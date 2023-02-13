@@ -1,35 +1,27 @@
 import './index.scss'
-import { useState, CSSProperties, useContext, useEffect } from 'react'
+import { CSSProperties, useContext, useReducer } from 'react'
 import { context } from '@/util/Context'
 import { useNavigate } from "react-router-dom";
-import { TTicTacToeBoard, initializeTicTacToeBoard, TTicTacToeSide, checkForWinnerTicTacToe } from 'shared'
+import { TTicTacToeSide, initTicTacToeState } from 'shared'
 import InGameOptions from '@/components/InGameOptions';
 import InGameScore from '@/components/TicTacToeScore';
 import Switch from '@/components/Switch';
 import CircleSVG from '@/components/icons/CircleSVG';
 import CrossSVG from '@/components/icons/CrossSVG';
-
+import reducer from './reducer'
 
 interface ITicTacToeProps {
 
 }
 
 const TicTacToe: React.FC<ITicTacToeProps> = () => {
-
-  const [boardState, setBoardState] = useState<TTicTacToeBoard>(initializeTicTacToeBoard(12))
-  const [isPlaying, setIsPlaying] = useState<TTicTacToeSide>('O')
+  const [state, dispatch] = useReducer(reducer, initTicTacToeState())
+  const { theme, setTheme } = useContext(context)
   const navigate = useNavigate();
 
-  const { theme, setTheme } = useContext(context)
-
-  const handleClick = (x: number, y: number) => () => {
-    if (boardState[x][y]) return
-    setBoardState(prevState => {
-      prevState[x][y] = isPlaying
-      console.log(checkForWinnerTicTacToe(prevState, [x, y], 5))
-      return prevState
-    })
-    setIsPlaying(prevState => prevState === 'O' ? 'X' : 'O')
+  const handleClick = (X: number, Y: number) => () => {
+    if (state.board[X][Y] || state.winner) return
+    dispatch({ type: 'HOTSEAT_MOVE', payload: { moveCOORD: { X, Y } } })
   }
 
   const renderIcon = (value: TTicTacToeSide | null) => {
@@ -40,23 +32,23 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
 
   const setSquareStyles = (x: number, y: number) => {
     const styles: CSSProperties = {}
-    if (x === 0) styles.borderLeft = 'none'
-    if (y === 0) styles.borderTop = 'none'
+    if (x === 0) styles.borderTop = 'none'
+    if (y === 0) styles.borderLeft = 'none'
     return styles
   }
 
   const homeCb = () => { navigate('/') }
-  const resetCb = () => { setBoardState(initializeTicTacToeBoard(9)) }
+  const resetCb = () => { dispatch({ type: 'RESET_STATE' }) }
   const lightModeCb = () => { setTheme(theme === 'dark' ? 'light' : 'dark') }
 
   return <div className='TicTacToe'>
-    <InGameScore game='TicTacToe' />
+    <InGameScore score={state.score} />
     <div className="board">
-      {boardState.map((column, x) => <div key={x}>
-        {column.map((square, y) => <div
-          key={y}
-          onClick={handleClick(x, y)}
-          style={setSquareStyles(x, y)}
+      {state.board.map((row, X) => <div key={X}>
+        {row.map((square, Y) => <div
+          key={Y}
+          onClick={handleClick(X, Y)}
+          style={setSquareStyles(X, Y)}
         >
           {renderIcon(square)}
         </div>
@@ -64,7 +56,7 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
       </div>
       )}
     </div>
-    <Switch isPlaying={isPlaying} />
+    <Switch currentlyPlaying={state.currentlyPlaying} />
     <InGameOptions homeCb={homeCb} resetCb={resetCb} lightModeCb={lightModeCb} />
     <div className="options">
     </div>
