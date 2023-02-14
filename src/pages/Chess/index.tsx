@@ -2,15 +2,17 @@ import './index.scss'
 import { initChessBoard, TChessState } from 'shared';
 import { CSSProperties, useState, useContext } from 'react';
 import { useNavigate } from "react-router-dom";
-import blackBishop from './icons/svg/BlackBishop.svg'
+import BBishop from './icons/svg/BBishop.svg'
 import { context } from '@/util/Context'
 import InGameOptions from '@/components/InGameOptions';
 import ChessHistory from './ChessHistory';
+import SVGP from './icons'
 
 const Chess: React.FC = () => {
     const [boardState, setBoardState] = useState<TChessState>(initChessBoard())
     const navigate = useNavigate();
     const { theme, setTheme } = useContext(context)
+
 
     const setSquareStyles = (x: number, y: number) => {
         const styles: CSSProperties = {}
@@ -28,20 +30,20 @@ const Chess: React.FC = () => {
     return <div className='Chess'>
         <div className="figuresTaken">
             <div className='player1'>
-                <img src={blackBishop} alt="" />
-                <img src={blackBishop} alt="" />
-                <img src={blackBishop} alt="" />
-                <img src={blackBishop} alt="" />
-                <img src={blackBishop} alt="" />
-                <img src={blackBishop} alt="" />
+                <img src={SVGP.BK} alt="" />
+                <img src={BBishop} alt="" />
+                <img src={BBishop} alt="" />
+                <img src={BBishop} alt="" />
+                <img src={BBishop} alt="" />
+                <img src={BBishop} alt="" />
             </div>
             <div className='player2'>
-                <img src={blackBishop} alt="" />
-                <img src={blackBishop} alt="" />
-                <img src={blackBishop} alt="" />
-                <img src={blackBishop} alt="" />
-                <img src={blackBishop} alt="" />
-                <img src={blackBishop} alt="" />
+                <img src={BBishop} alt="" />
+                <img src={BBishop} alt="" />
+                <img src={BBishop} alt="" />
+                <img src={BBishop} alt="" />
+                <img src={BBishop} alt="" />
+                <img src={BBishop} alt="" />
             </div>
         </div>
         <div className="board">
@@ -53,7 +55,7 @@ const Chess: React.FC = () => {
                             key={x}
                             style={setSquareStyles(x, y)}
                         >
-                            <img src={blackBishop} alt="" />
+                            <img src={BBishop} alt="" />
 
                         </div>
                     })}

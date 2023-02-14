@@ -21,7 +21,7 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
 
   const handleClick = (X: number, Y: number) => () => {
     if (state.board[X][Y] || state.winner) return
-    dispatch({ type: 'HOTSEAT_MOVE', payload: { moveCOORD: { X, Y } } })
+    dispatch({ type: 'HOTSEAT_MOVE', payload: { moveCOORD: [X, Y] } })
   }
 
   const renderIcon = (value: TTicTacToeSide | null) => {
