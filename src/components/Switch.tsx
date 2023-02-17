@@ -5,15 +5,15 @@ import CrossSVG from '@/components/icons/CrossSVG';
 
 
 interface ISwitchProps {
-    currentlyPlaying: 'X' | 'O' | 'black' | 'white'
+    activePlayer: 'X' | 'O' | 'black' | 'white'
 }
 
-const Switch: React.FC<ISwitchProps> = ({ currentlyPlaying }) => {
-    const [pos, setPos] = useState<'left' | 'right'>(['O', 'black'].includes(currentlyPlaying) ? 'left' : 'right')
+const Switch: React.FC<ISwitchProps> = ({ activePlayer }) => {
+    const [pos, setPos] = useState<'left' | 'right'>(['O', 'black'].includes(activePlayer) ? 'left' : 'right')
 
     useEffect(() => {
-        setPos(['O', 'black'].includes(currentlyPlaying) ? 'left' : 'right')
-    }, [currentlyPlaying])
+        setPos(['O', 'black'].includes(activePlayer) ? 'left' : 'right')
+    }, [activePlayer])
 
     return <div className={`Switch ${pos === 'left' ? 'flexStart' : 'flexEnd'}`} >
         <div className="icons">

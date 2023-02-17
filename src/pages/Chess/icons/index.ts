@@ -1,15 +1,15 @@
-import BK from './svg/BKing.svg'
-import BQ from './svg/BQueen.svg'
-import BR from './svg/BRook.svg'
-import BB from './svg/BBishop.svg'
-import BN from './svg/BKnight.svg'
-import BP from './svg/BPawn.svg'
+import bk from './svg/BKing.svg'
+import bq from './svg/BQueen.svg'
+import br from './svg/BRook.svg'
+import bb from './svg/BBishop.svg'
+import bn from './svg/BKnight.svg'
+import bp from './svg/BPawn.svg'
 
-import WK from './svg/WKing.svg'
-import WQ from './svg/WQueen.svg'
-import WR from './svg/WRook.svg'
-import WB from './svg/WBishop.svg'
-import WN from './svg/WKnight.svg'
-import WP from './svg/WPawn.svg'
+import wk from './svg/WKing.svg'
+import wq from './svg/WQueen.svg'
+import wr from './svg/WRook.svg'
+import wb from './svg/WBishop.svg'
+import wn from './svg/WKnight.svg'
+import wp from './svg/WPawn.svg'
 
-export default { BK, BQ, BR, BB, BN, BP, WK, WQ, WR, WB, WN, WP } 
+export default { bk, bq, br, bb, bn, bp, wk, wq, wr, wb, wn, wp, ee: undefined } 

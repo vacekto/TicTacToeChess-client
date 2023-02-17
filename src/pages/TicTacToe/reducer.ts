@@ -13,14 +13,14 @@ const reducer = (prevState: ITicTacToeState, action: TTicTacToeAction) => {
     switch (action.type) {
         case 'HOTSEAT_MOVE':
             const [X, Y] = action.payload.moveCOORD
-            update.board[X][Y] = prevState.currentlyPlaying
+            update.board[X][Y] = prevState.activePlayer
             const gameState = checkForWinnerTicTacToe(update.board, 5, [X, Y])
             if (gameState.winner) {
                 update.winner = gameState.winner
                 update.score = { ...prevState.score }
                 update.score[gameState.winner] = prevState.score[gameState.winner] + 1
             }
-            update.currentlyPlaying = prevState.currentlyPlaying === 'O' ? 'X' : 'O'
+            update.activePlayer = prevState.activePlayer === 'O' ? 'X' : 'O'
             return update
         case 'RESET_STATE':
             return initTicTacToeState()

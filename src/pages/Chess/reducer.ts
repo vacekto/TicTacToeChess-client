@@ -1,31 +1,50 @@
 import {
-    checkForWinnerTicTacToe,
-    initTicTacToeState,
-    ITicTacToeState
+    IChessState,
 } from 'shared'
 
-// tady bude instance hry
 
-export type TTicTacToeAction =
-    | { type: 'HOTSEAT_MOVE'; payload: { moveCOORD: { X: number, Y: number } } }
-    | { type: 'RESET_STATE' }
+export interface IReducerState extends IChessState {
+    selected: [number, number] | null
+    potentialMoves: [number, number][]
+}
 
-const reducer = (prevState: ITicTacToeState, action: TTicTacToeAction) => {
-    let update = { ...prevState }
+export type TChessAction =
+    | { type: 'MOVE'; payload: { state: IChessState } }
+    | { type: 'INIT_STATE', payload: { state: IChessState } }
+    | { type: 'DESELECT' }
+    | {
+        type: 'SELECT'; payload: {
+            coord: [number, number]
+            potentialMoves: [number, number][]
+        }
+    }
+
+const reducer = (prevState: IReducerState, action: TChessAction) => {
+    let update = { ...prevState } as IReducerState
     switch (action.type) {
-        case 'HOTSEAT_MOVE':
-            const { X, Y } = action.payload.moveCOORD
-            update.board[X][Y] = prevState.currentlyPlaying
-            const gameState = checkForWinnerTicTacToe(update.board, 5, [X, Y])
-            if (gameState.winner) {
-                update.winner = gameState.winner
-                update.score = { ...prevState.score }
-                update.score[gameState.winner] = prevState.score[gameState.winner] + 1
+        case 'MOVE':
+            update = {
+                ...action.payload.state,
+                selected: null,
+                potentialMoves: []
             }
-            update.currentlyPlaying = prevState.currentlyPlaying === 'O' ? 'X' : 'O'
+
             return update
-        case 'RESET_STATE':
-            return initTicTacToeState()
+        case 'DESELECT':
+            update.selected = null
+            update.potentialMoves = []
+            return update
+        case 'SELECT':
+            update.selected = action.payload.coord
+            update.potentialMoves = action.payload.potentialMoves
+            return update
+        case 'INIT_STATE':
+            update = {
+                ...action.payload.state,
+                selected: null,
+                potentialMoves: [],
+            }
+            return update
         default:
     }
     throw Error('Unknown reducer action');

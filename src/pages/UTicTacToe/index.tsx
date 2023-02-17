@@ -59,7 +59,7 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
         })
     }
 
-    const renderIcon = (value: TTicTacToeSide | null) => {
+    const renderIcon = (value: TTicTacToeSide | null | 'draw') => {
         if (value === 'O') return <CircleSVG />
         if (value === 'X') return <CrossSVG />
         return null
@@ -96,7 +96,7 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
                 </div>
             })}
         </div>
-        <Switch currentlyPlaying={state.currentlyPlaying} />
+        <Switch activePlayer={state.activePlayer} />
         <InGameOptions homeCb={homeCb} resetCb={resetCb} lightModeCb={lightModeCb} />
     </div>;
 };
