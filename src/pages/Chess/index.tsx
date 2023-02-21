@@ -28,13 +28,18 @@ const Chess: React.FC = () => {
     }
 
     const handleSquareClick = (X: number, Y: number) => () => {
-        const SE = state.selected
+        const [SE, AP] = [state.selected, state.activePlayer]
 
         for (let [A, B] of state.potentialMoves) {
             if (A === X && B === Y) {
+                if (SE && state.board[SE[0]][SE[1]][0] !== AP[0]) {
+                    dispatch({ type: 'DESELECT' })
+                    return
+                }
                 gameRef.current!.move([SE![0], SE![1]], [X, Y])
-                const state = gameRef.current!.state
-                dispatch({ type: 'MOVE', payload: { state } })
+                const stateUpdate = gameRef.current!.state
+                console.log('move')
+                dispatch({ type: 'MOVE', payload: { state: stateUpdate } })
                 return
             }
         }
@@ -80,37 +85,16 @@ const Chess: React.FC = () => {
         }
     }, [])
 
-    const white = () => {
-        console.log('white in danger: ' + gameRef.current?.isKingEndangered('w'))
-    }
-    const black = () => {
-        console.log('black in danger: ' + gameRef.current?.isKingEndangered('b'))
-    }
-    const board = () => {
-        console.log(state.board)
-    }
-    const moves = () => {
-        console.log(state.potentialMoves)
-    }
-    const danger = () => {
-        let test = false
-        state.potentialMoves.forEach(([A, B]) => {
-            if (state.kingsPos['w'][0] === A && state.kingsPos['w'][0] === B) test = true
-            if (state.kingsPos['b'][0] === A && state.kingsPos['b'][0] === B) test = true
-        })
-        if (test) console.log('danger!!')
-        else console.log('no danger')
-    }
-    const reducerState = () => {
+    useEffect(() => {
+  
+    })
+
+    const test = () => {
         console.log(state)
     }
+
     return <div className='Chess'>
-        <button onClick={black}>black</button>
-        <button onClick={white}>white</button>
-        <button onClick={moves}>moves</button>
-        <button onClick={board}>board</button>
-        <button onClick={danger}>danger</button>
-        <button onClick={reducerState}>state</button>
+        <button onClick={test}>test</button>
         <div className="figuresTaken">
             <div className='player1'>
                 <img src={SVG.bk} alt="" />
