@@ -1,14 +1,21 @@
 import './ChessHistory.scss'
 import { Backward, Forward, ToEnd, ToStart, Pause, Play } from './icons/History';
 
-const ChessHistory: React.FC = () => {
+interface IChessHistoryProps {
+    forwardCb: () => void
+    backwardCb: () => void
+    fastForwardCb: () => void
+    fastBackwardCb: () => void
+
+}
+
+const ChessHistory: React.FC<IChessHistoryProps> = ({ forwardCb, backwardCb, fastBackwardCb, fastForwardCb }) => {
 
     return <div className='ChessHistory'>
-        <div><ToStart /></div>
-        <div><Backward /></div>
-        <div><Play /></div>
-        <div><Forward /></div>
-        <div><ToEnd /></div>
+        <div onClick={fastBackwardCb}><ToStart /></div>
+        <div onClick={backwardCb}><Backward /></div>
+        <div onClick={forwardCb}><Forward /></div>
+        <div onClick={fastForwardCb}><ToEnd /></div>
     </div>;
 };
 

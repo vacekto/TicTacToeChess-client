@@ -2,12 +2,12 @@ import './App.scss';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useContext } from 'react'
 import Menu from './pages/Menu';
-import TicTacToe from './pages/TicTacToe';
-import UTicTacToe from './pages/UTicTacToe';
+import TicTacToe from './pages/TicTacToe/TicTacToe';
+import UTicTacToe from './pages/UTicTacToe/UTicTacToe';
 import { useEffect, useRef } from 'react';
 import registerDragToScroll from './util/functions/dragToScroll'
-import { context } from './util/Context';
-import Chess from './pages/Chess';
+import { context } from './util/context/ContextProvider';
+import Chess from './pages/Chess/Chess';
 
 function App() {
   const appElement = useRef<HTMLDivElement | null>(null);

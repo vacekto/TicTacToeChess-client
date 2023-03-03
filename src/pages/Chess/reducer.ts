@@ -9,8 +9,8 @@ export interface IReducerState extends IChessState {
 }
 
 export type TChessAction =
-    | { type: 'MOVE'; payload: { state: IChessState } }
-    | { type: 'INIT_STATE', payload: { state: IChessState } }
+    | { type: 'STATE_UPDATE'; payload: { state: IChessState } }
+    | { type: 'RESET_STATE', payload: { state: IChessState } }
     | { type: 'DESELECT' }
     | {
         type: 'SELECT'; payload: {
@@ -22,7 +22,7 @@ export type TChessAction =
 const reducer = (prevState: IReducerState, action: TChessAction) => {
     let update = { ...prevState } as IReducerState
     switch (action.type) {
-        case 'MOVE':
+        case 'STATE_UPDATE':
             update = {
                 ...action.payload.state,
                 selected: null,
@@ -38,7 +38,7 @@ const reducer = (prevState: IReducerState, action: TChessAction) => {
             update.selected = action.payload.coord
             update.potentialMoves = action.payload.potentialMoves
             return update
-        case 'INIT_STATE':
+        case 'RESET_STATE':
             update = {
                 ...action.payload.state,
                 selected: null,

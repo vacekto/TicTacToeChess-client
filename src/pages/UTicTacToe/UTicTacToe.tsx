@@ -1,43 +1,54 @@
-import './index.scss'
-import {
-    TTicTacToeSide,
-    initUTicTacToeState
-} from 'shared';
-import {
-    useContext,
-    CSSProperties,
-    useReducer,
-} from 'react'
-import { context } from '@/util/Context'
 import { useNavigate } from "react-router-dom";
+import useTheme from "@/util/context/useTheme";
+import useGame from "@/util/context/useGame";
 import InGameOptions from '@/components/InGameOptions';
 import InGameScore from '@/components/TicTacToeScore';
 import Switch from '@/components/Switch';
 import CircleSVG from '@/components/icons/CircleSVG';
 import CrossSVG from '@/components/icons/CrossSVG';
 import reducer from './reducer'
+import './UTicTacToe.scss'
+import {
+    TTicTacToeSide,
+    UTicTacToeGame
+} from 'shared';
+import {
+    useReducer,
+} from 'react'
 
 interface ITicTacToeProps {
 
 }
 
 const UTicTacToe: React.FC<ITicTacToeProps> = () => {
-    const [state, dispatch] = useReducer(reducer, initUTicTacToeState())
+    const gameInstance = useGame('uTicTacToe') as UTicTacToeGame
+    const [state, dispatch] = useReducer(reducer, {
+        ...gameInstance.state,
+        score: {
+            X: 0,
+            O: 0,
+            draw: 0
+        }
+    })
+    const { theme, setTheme } = useTheme()
     const navigate = useNavigate();
-    const { theme, setTheme } = useContext(context)
 
     const homeCb = () => { navigate('/') }
-    const resetCb = () => { dispatch({ type: 'RESET_STATE' }) }
+    const resetCb = () => {
+        gameInstance.resetState()
+        const stateUpdate = gameInstance.state
+        dispatch({ type: 'STATE_RESET', payload: { state: stateUpdate } })
+    }
     const lightModeCb = () => { setTheme(theme === 'dark' ? 'light' : 'dark') }
 
-    const setSquareStyles = (X: number, Y: number) => {
-        const styles: CSSProperties = {}
-        if (X === 0) styles.borderTop = 'none'
-        if (Y === 0) styles.borderLeft = 'none'
-        return styles
+    const setSquareStyleClass = (X: number, Y: number) => {
+        let className = ''
+        if (X === 0) className += 'noBorderTop '
+        if (Y === 0) className += 'noBorderLeft '
+        return className
     }
 
-    const setActiveSegment = (SX: number, SY: number) => {
+    const markActiveSegment = (SX: number, SY: number) => {
         if (state.activeSegment) {
             const [A, B] = state.activeSegment
             if (A === SX && B === SY) return 'active'
@@ -53,9 +64,12 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
             const [A, B] = state.activeSegment
             if (A !== SX || B !== SY) return
         }
+        gameInstance.move(SX, SY, X, Y)
+        const stateUpdate = gameInstance.state
+        console.log(stateUpdate)
         dispatch({
-            type: 'HOTSEAT_MOVE',
-            payload: { moveCOORD: [SX, SY, X, Y] }
+            type: 'STATE_UPDATE',
+            payload: { state: stateUpdate }
         })
     }
 
@@ -65,6 +79,7 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
         return null
     }
 
+
     return <div className='UTicTacToe'>
         <InGameScore score={{ ...state.score }} />
         <div className="ultimateBoard">
@@ -72,7 +87,7 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
                 return <div className='ultimateRow' key={SX}>
                     {ultimateRow.map((ultimateSquare, SY) => {
                         return <div
-                            className={`ultimateSquare ${setActiveSegment(SX, SY)}`}
+                            className={`ultimateSquare ${markActiveSegment(SX, SY)}`}
                             key={SY}>
                             {/*<div className='squareDone'>
                                 <CircleSVG />
@@ -81,9 +96,8 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
                                 return <div className='row' key={X}>
                                     {row.map((square, Y) => {
                                         return <div
-                                            className='square'
+                                            className={`square ${setSquareStyleClass(X, Y)}`}
                                             key={Y}
-                                            style={setSquareStyles(X, Y)}
                                             onClick={handleClick(SX, SY, X, Y)}
                                         >
                                             {renderIcon(square)}

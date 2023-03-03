@@ -1,32 +1,90 @@
 import {
-    checkForWinnerTicTacToe,
-    initTicTacToeState,
     ITicTacToeState
 } from 'shared'
 
-export type TTicTacToeAction =
-    | { type: 'HOTSEAT_MOVE'; payload: { moveCOORD: [X: number, Y: number] } }
-    | { type: 'RESET_STATE' }
+interface IReducerState extends ITicTacToeState {
+    score: {
+        X: number
+        O: number
+        draw: number
+    }
+}
 
-const reducer = (prevState: ITicTacToeState, action: TTicTacToeAction) => {
+type TTicTacToeAction =
+    | { type: 'STATE_UPDATE'; payload: { state: ITicTacToeState } }
+
+const reducer = (prevState: IReducerState, action: TTicTacToeAction) => {
     let update = { ...prevState }
     switch (action.type) {
-        case 'HOTSEAT_MOVE':
-            const [X, Y] = action.payload.moveCOORD
-            update.board[X][Y] = prevState.activePlayer
-            const gameState = checkForWinnerTicTacToe(update.board, 5, [X, Y])
-            if (gameState.winner) {
-                update.winner = gameState.winner
-                update.score = { ...prevState.score }
-                update.score[gameState.winner] = prevState.score[gameState.winner] + 1
+        case 'STATE_UPDATE':
+            const state = action.payload.state
+            update = {
+                ...state,
+                score: {
+                    ...prevState.score
+                }
             }
-            update.activePlayer = prevState.activePlayer === 'O' ? 'X' : 'O'
+            if (state.winner) {
+                update.score[state.winner] = prevState.score[state.winner] + 1
+            }
             return update
-        case 'RESET_STATE':
-            return initTicTacToeState()
         default:
     }
     throw Error('Unknown reducer action');
 }
 
 export default reducer
+
+// import {
+//     IChessState,
+// } from 'shared'
+
+
+// export interface IReducerState extends IChessState {
+//     selected: [number, number] | null
+//     potentialMoves: [number, number][]
+// }
+
+// export type TChessAction =
+//     | { type: 'STATE_UPDATE'; payload: { state: IChessState } }
+//     | { type: 'INIT_STATE', payload: { state: IChessState } }
+//     | { type: 'DESELECT' }
+//     | {
+//         type: 'SELECT'; payload: {
+//             coord: [number, number]
+//             potentialMoves: [number, number][]
+//         }
+//     }
+
+// const reducer = (prevState: IReducerState, action: TChessAction) => {
+//     let update = { ...prevState } as IReducerState
+//     switch (action.type) {
+//         case 'STATE_UPDATE':
+//             update = {
+//                 ...action.payload.state,
+//                 selected: null,
+//                 potentialMoves: []
+//             }
+
+//             return update
+//         case 'DESELECT':
+//             update.selected = null
+//             update.potentialMoves = []
+//             return update
+//         case 'SELECT':
+//             update.selected = action.payload.coord
+//             update.potentialMoves = action.payload.potentialMoves
+//             return update
+//         case 'INIT_STATE':
+//             update = {
+//                 ...action.payload.state,
+//                 selected: null,
+//                 potentialMoves: [],
+//             }
+//             return update
+//         default:
+//     }
+//     throw Error('Unknown reducer action');
+// }
+
+// export default reducer

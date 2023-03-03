@@ -56,6 +56,14 @@
                             stroke: $light-player2
                         }
                     }
+
+                    .noBorderTop {
+                        border-top: none;
+                    }
+
+                    .noBorderLeft {
+                        border-left: none;
+                    }
                 }
             }
         }

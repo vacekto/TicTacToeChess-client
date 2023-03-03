@@ -1,8 +1,9 @@
-import './index.scss'
-import { CSSProperties, useContext, useReducer } from 'react'
-import { context } from '@/util/Context'
+import './TicTacToe.scss'
+import { useReducer } from 'react'
+import useGame from '@/util/context/useGame'
+import useTheme from '@/util/context/useTheme'
 import { useNavigate } from "react-router-dom";
-import { TTicTacToeSide, initTicTacToeState } from 'shared'
+import { TTicTacToeSide, TicTacToeGame } from 'shared'
 import InGameOptions from '@/components/InGameOptions';
 import InGameScore from '@/components/TicTacToeScore';
 import Switch from '@/components/Switch';
@@ -15,13 +16,23 @@ interface ITicTacToeProps {
 }
 
 const TicTacToe: React.FC<ITicTacToeProps> = () => {
-  const [state, dispatch] = useReducer(reducer, initTicTacToeState())
-  const { theme, setTheme } = useContext(context)
+  const gameInstance = useGame('ticTacToe') as TicTacToeGame
+  const [state, dispatch] = useReducer(reducer, {
+    ...gameInstance.state,
+    score: {
+      X: 0,
+      O: 0,
+      draw: 0
+    }
+  })
+  const { theme, setTheme } = useTheme()
   const navigate = useNavigate();
 
   const handleClick = (X: number, Y: number) => () => {
     if (state.board[X][Y] || state.winner) return
-    dispatch({ type: 'HOTSEAT_MOVE', payload: { moveCOORD: [X, Y] } })
+    gameInstance.move([X, Y])
+    const stateUpdate = gameInstance.state
+    dispatch({ type: 'STATE_UPDATE', payload: { state: stateUpdate } })
   }
 
   const renderIcon = (value: TTicTacToeSide | null | 'draw') => {
@@ -30,16 +41,21 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
     return null
   }
 
-  const setSquareStyles = (x: number, y: number) => {
-    const styles: CSSProperties = {}
-    if (x === 0) styles.borderTop = 'none'
-    if (y === 0) styles.borderLeft = 'none'
-    return styles
+  const setSquareStyleClass = (X: number, Y: number) => {
+    let className = ''
+    if (X === 0) className += 'noBorderTop '
+    if (Y === 0) className += 'noBorderLeft '
+    return className
   }
 
   const homeCb = () => { navigate('/') }
-  const resetCb = () => { dispatch({ type: 'RESET_STATE' }) }
+  const resetCb = () => {
+    gameInstance.resetState()
+    const stateUpdate = gameInstance.state
+    dispatch({ type: 'STATE_UPDATE', payload: { state: stateUpdate } })
+  }
   const lightModeCb = () => { setTheme(theme === 'dark' ? 'light' : 'dark') }
+
 
   return <div className='TicTacToe'>
     <InGameScore score={state.score} />
@@ -48,7 +64,7 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
         {row.map((square, Y) => <div
           key={Y}
           onClick={handleClick(X, Y)}
-          style={setSquareStyles(X, Y)}
+          className={setSquareStyleClass(X, Y)}
         >
           {renderIcon(square)}
         </div>
