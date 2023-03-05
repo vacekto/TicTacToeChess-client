@@ -10,13 +10,14 @@ import {
 
 type TUseGame = (
     game: TGameName,
-    // size: number,
-    // winCondition: number
-) => TGameInstance
+    size?: number,
+    winCondition?: number,
+    startingPlayer?: 'O' | 'X'
+) => { gameInstance: TGameInstance }
 
 
 
-const useGame: TUseGame = (game) => {
+const useGame: TUseGame = (game, size = 12, winCondition = 5, startingPlayer = 'O') => {
     let gameRef: React.MutableRefObject<TGameInstance | null> = useRef(null)
 
     if (!gameRef.current) {
@@ -25,14 +26,14 @@ const useGame: TUseGame = (game) => {
                 gameRef.current = new ChessGame()
                 break;
             case 'ticTacToe':
-                gameRef.current = new TicTacToeGame(3, 3, 'O')
+                gameRef.current = new TicTacToeGame(size!, winCondition!, startingPlayer!)
                 break;
             case 'uTicTacToe':
-                gameRef.current = new UTicTacToeGame('O')
+                gameRef.current = new UTicTacToeGame(startingPlayer!)
                 break;
         }
     }
-    return gameRef.current
+    return { gameInstance: gameRef.current }
 }
 
 export default useGame

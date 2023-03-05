@@ -1,10 +1,12 @@
 import './Chess.scss'
-import { useReducer } from 'react';
+import { useReducer, useContext } from 'react';
 import { useNavigate } from "react-router-dom";
 import useGame from '@/util/context/useGame'
 import useTheme from '@/util/context/useTheme';
 import { ChessGame, IChessState } from 'shared';
 import InGameOptions from '@/components/InGameOptions';
+import InGameUsername from '@/components/InGameUsername';
+import { context } from '@/util/context/ContextProvider'
 import ChessHistory from './ChessHistory';
 import SVG from './icons/ChessPiece'
 import reducer from './reducer'
@@ -12,7 +14,8 @@ import reducer from './reducer'
 
 
 const Chess: React.FC = () => {
-    const gameInstance = useGame('chess') as ChessGame
+    const { gameInstance } = useGame('chess') as { gameInstance: ChessGame }
+    const { username, opponentUsername } = useContext(context)
     const { theme, setTheme } = useTheme()
     const [state, dispatch] = useReducer(reducer, {
         ...gameInstance.state,
@@ -110,7 +113,8 @@ const Chess: React.FC = () => {
     }
 
     return <div className='Chess'>
-        <button onClick={test}>test</button>
+        <InGameUsername username={username} opponentUsername={opponentUsername} />
+
         <div className="figuresTaken">
             <div className='player1'>
                 {state.figuresTaken.w.map((piece, index) => {

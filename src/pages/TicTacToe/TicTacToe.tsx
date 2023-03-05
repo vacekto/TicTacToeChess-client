@@ -1,11 +1,13 @@
 import './TicTacToe.scss'
-import { useReducer } from 'react'
+import { useReducer, useContext } from 'react'
+import { context } from '@/util/context/ContextProvider'
 import useGame from '@/util/context/useGame'
 import useTheme from '@/util/context/useTheme'
 import { useNavigate } from "react-router-dom";
 import { TTicTacToeSide, TicTacToeGame } from 'shared'
 import InGameOptions from '@/components/InGameOptions';
 import InGameScore from '@/components/TicTacToeScore';
+import InGameUsername from '@/components/InGameUsername'
 import Switch from '@/components/Switch';
 import CircleSVG from '@/components/icons/CircleSVG';
 import CrossSVG from '@/components/icons/CrossSVG';
@@ -16,7 +18,8 @@ interface ITicTacToeProps {
 }
 
 const TicTacToe: React.FC<ITicTacToeProps> = () => {
-  const gameInstance = useGame('ticTacToe') as TicTacToeGame
+  const { username, opponentUsername } = useContext(context)
+  const { gameInstance } = useGame('ticTacToe') as { gameInstance: TicTacToeGame }
   const [state, dispatch] = useReducer(reducer, {
     ...gameInstance.state,
     score: {
@@ -58,6 +61,7 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
 
 
   return <div className='TicTacToe'>
+    <InGameUsername username={username} opponentUsername={opponentUsername} />
     <InGameScore score={state.score} />
     <div className="board">
       {state.board.map((row, X) => <div key={X}>

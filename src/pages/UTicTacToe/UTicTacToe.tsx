@@ -1,13 +1,16 @@
 import { useNavigate } from "react-router-dom";
+import { useContext } from 'react'
 import useTheme from "@/util/context/useTheme";
 import useGame from "@/util/context/useGame";
 import InGameOptions from '@/components/InGameOptions';
 import InGameScore from '@/components/TicTacToeScore';
+import InGameUsername from "@/components/InGameUsername";
 import Switch from '@/components/Switch';
 import CircleSVG from '@/components/icons/CircleSVG';
 import CrossSVG from '@/components/icons/CrossSVG';
 import reducer from './reducer'
 import './UTicTacToe.scss'
+import { context } from '@/util/context/ContextProvider'
 import {
     TTicTacToeSide,
     UTicTacToeGame
@@ -21,7 +24,8 @@ interface ITicTacToeProps {
 }
 
 const UTicTacToe: React.FC<ITicTacToeProps> = () => {
-    const gameInstance = useGame('uTicTacToe') as UTicTacToeGame
+    const { username, opponentUsername } = useContext(context)
+    const { gameInstance } = useGame('uTicTacToe') as { gameInstance: UTicTacToeGame }
     const [state, dispatch] = useReducer(reducer, {
         ...gameInstance.state,
         score: {
@@ -81,6 +85,7 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
 
 
     return <div className='UTicTacToe'>
+        <InGameUsername username={username} opponentUsername={opponentUsername} />
         <InGameScore score={{ ...state.score }} />
         <div className="ultimateBoard">
             {state.board.map((ultimateRow, SX) => {
