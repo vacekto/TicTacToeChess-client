@@ -1,22 +1,25 @@
 import './Chess.scss'
-import { useReducer, useContext } from 'react';
+import { useReducer, useContext, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
-import useGame from '@/util/context/useGame'
-import useTheme from '@/util/context/useTheme';
-import { ChessGame, IChessState } from 'shared';
+import useGame from '@/util/useGame'
+import { ChessGame, IChessState, TGameMode } from 'shared';
 import InGameOptions from '@/components/InGameOptions';
 import InGameUsername from '@/components/InGameUsername';
-import { context } from '@/util/context/ContextProvider'
+import { context } from '@/util/globalContext/ContextProvider'
 import ChessHistory from './ChessHistory';
 import SVG from './icons/ChessPiece'
 import reducer from './reducer'
 
-
-
 const Chess: React.FC = () => {
-    const { gameInstance } = useGame('chess') as { gameInstance: ChessGame }
-    const { username, opponentUsername } = useContext(context)
-    const { theme, setTheme } = useTheme()
+    const {
+        username,
+        opponentUsername,
+        switchLightTheme,
+        gameMode,
+        gameSide,
+        socketProxy
+    } = useContext(context)
+    const { gameInstance } = useGame('chess', gameMode as TGameMode) as { gameInstance: ChessGame }
     const [state, dispatch] = useReducer(reducer, {
         ...gameInstance.state,
         selected: null,
@@ -69,7 +72,6 @@ const Chess: React.FC = () => {
         })
     }
 
-    const homeCb = () => { navigate('/') }
     const resetCb = () => {
         gameInstance.resetState()
         const state = gameInstance.state as IChessState
@@ -77,9 +79,6 @@ const Chess: React.FC = () => {
             type: 'RESET_STATE',
             payload: { state }
         })
-    }
-    const lightModeCb = () => {
-        setTheme(theme === 'dark' ? 'light' : 'dark')
     }
 
     const forwardCb = () => {
@@ -108,9 +107,12 @@ const Chess: React.FC = () => {
 
     }
 
-    const test = () => {
-        console.log(state)
-    }
+    useEffect(() => {
+        socketProxy.on('gameStateUpdate', () => {
+            //update state 
+        })
+    }, [])
+
 
     return <div className='Chess'>
         <InGameUsername username={username} opponentUsername={opponentUsername} />
@@ -142,11 +144,7 @@ const Chess: React.FC = () => {
                 </div>
             })}
         </div>
-        <InGameOptions
-            homeCb={homeCb}
-            resetCb={resetCb}
-            lightModeCb={lightModeCb}
-        />
+        <InGameOptions resetCb={resetCb} />
         <ChessHistory
             backwardCb={backwardCb}
             forwardCb={forwardCb}

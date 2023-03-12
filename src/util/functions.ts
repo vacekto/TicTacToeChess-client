@@ -1,10 +1,17 @@
+import { IGlobalState } from './globalContext/reducer'
+import { TClientSocket } from './socketSingleton'
+
 interface myApp extends HTMLElement {
     dragToScrollRegistered?: boolean
 }
 
+type TInitUsernameFromStorage = (
+    updateGlobalState: (stateUpdate: Partial<IGlobalState>,) => void,
+    socket: TClientSocket
+) => void
 
-const registerDragToScroll = (app: myApp) => {
-    if (!app || app.dragToScrollRegistered) return
+export const registerDragToScroll = (app: myApp) => {
+    if (app.dragToScrollRegistered) return
     let pos = { top: 0, left: 0, x: 0, y: 0 };
     app.dragToScrollRegistered = true
     console.log('dragToScrollRegistered')
@@ -35,7 +42,18 @@ const registerDragToScroll = (app: myApp) => {
         document.removeEventListener('mousemove', mouseMoveHandler);
         document.removeEventListener('mouseup', mouseUpHandler);
     };
-
 }
 
-export default registerDragToScroll
+
+
+export const initUsernameFromStorage: TInitUsernameFromStorage = (updateGlobalState, socket) => {
+    const stateUpdate: Partial<IGlobalState> = {}
+
+    const username = localStorage.getItem('username');
+    if (!username) {
+        stateUpdate.showUsernameModal = true
+        updateGlobalState(stateUpdate)
+        return
+    }
+    socket.emit('setUsername', username)
+}

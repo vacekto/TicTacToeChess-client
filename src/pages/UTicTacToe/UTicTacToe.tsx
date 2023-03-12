@@ -1,7 +1,5 @@
-import { useNavigate } from "react-router-dom";
 import { useContext } from 'react'
-import useTheme from "@/util/context/useTheme";
-import useGame from "@/util/context/useGame";
+import useGame from "@/util/useGame";
 import InGameOptions from '@/components/InGameOptions';
 import InGameScore from '@/components/TicTacToeScore';
 import InGameUsername from "@/components/InGameUsername";
@@ -10,8 +8,9 @@ import CircleSVG from '@/components/icons/CircleSVG';
 import CrossSVG from '@/components/icons/CrossSVG';
 import reducer from './reducer'
 import './UTicTacToe.scss'
-import { context } from '@/util/context/ContextProvider'
+import { context } from '@/util/globalContext/ContextProvider'
 import {
+    TGameMode,
     TTicTacToeSide,
     UTicTacToeGame
 } from 'shared';
@@ -24,8 +23,12 @@ interface ITicTacToeProps {
 }
 
 const UTicTacToe: React.FC<ITicTacToeProps> = () => {
-    const { username, opponentUsername } = useContext(context)
-    const { gameInstance } = useGame('uTicTacToe') as { gameInstance: UTicTacToeGame }
+    const {
+        username,
+        opponentUsername,
+        gameMode
+    } = useContext(context)
+    const { gameInstance } = useGame('uTicTacToe', gameMode as TGameMode) as { gameInstance: UTicTacToeGame }
     const [state, dispatch] = useReducer(reducer, {
         ...gameInstance.state,
         score: {
@@ -34,16 +37,12 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
             draw: 0
         }
     })
-    const { theme, setTheme } = useTheme()
-    const navigate = useNavigate();
 
-    const homeCb = () => { navigate('/') }
     const resetCb = () => {
         gameInstance.resetState()
         const stateUpdate = gameInstance.state
         dispatch({ type: 'STATE_RESET', payload: { state: stateUpdate } })
     }
-    const lightModeCb = () => { setTheme(theme === 'dark' ? 'light' : 'dark') }
 
     const setSquareStyleClass = (X: number, Y: number) => {
         let className = ''
@@ -116,7 +115,7 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
             })}
         </div>
         <Switch activePlayer={state.activePlayer} />
-        <InGameOptions homeCb={homeCb} resetCb={resetCb} lightModeCb={lightModeCb} />
+        <InGameOptions resetCb={resetCb} />
     </div>;
 };
 

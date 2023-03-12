@@ -2,27 +2,32 @@ import './InGameOptions.scss'
 import Home from '@/components/icons/HomeSVG';
 import Repeat from '@/components/icons/RepeatSVG';
 import LightMode from '@/components/icons/LightModeSVG';
+import { useContext } from 'react';
+import { context } from '@/util/globalContext/ContextProvider';
 
 interface IInGameOptionsProps {
-  homeCb: () => void,
   resetCb: () => void,
-  lightModeCb: () => void
 }
 
 const InGameOptions: React.FC<IInGameOptionsProps> = ({
-  homeCb,
   resetCb,
-  lightModeCb
 }) => {
+  const { updateGlobalState, switchLightTheme } = useContext(context)
+
+  const handleHomeCklick = () => {
+    updateGlobalState({
+      gameName: ''
+    })
+  }
 
   return <div className='InGameOptions'>
-    <div onClick={homeCb}>
+    <div onClick={handleHomeCklick}>
       <Home />
     </div>
     <div onClick={resetCb}>
       <Repeat />
     </div>
-    <div onClick={lightModeCb}>
+    <div onClick={switchLightTheme}>
       <LightMode />
     </div>
   </div>;

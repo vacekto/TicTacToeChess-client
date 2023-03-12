@@ -1,10 +1,8 @@
 import './TicTacToe.scss'
 import { useReducer, useContext } from 'react'
-import { context } from '@/util/context/ContextProvider'
-import useGame from '@/util/context/useGame'
-import useTheme from '@/util/context/useTheme'
-import { useNavigate } from "react-router-dom";
-import { TTicTacToeSide, TicTacToeGame } from 'shared'
+import { context } from '@/util/globalContext/ContextProvider'
+import useGame from '@/util/useGame'
+import { TTicTacToeSide, TicTacToeGame, TGameMode } from 'shared'
 import InGameOptions from '@/components/InGameOptions';
 import InGameScore from '@/components/TicTacToeScore';
 import InGameUsername from '@/components/InGameUsername'
@@ -18,8 +16,12 @@ interface ITicTacToeProps {
 }
 
 const TicTacToe: React.FC<ITicTacToeProps> = () => {
-  const { username, opponentUsername } = useContext(context)
-  const { gameInstance } = useGame('ticTacToe') as { gameInstance: TicTacToeGame }
+  const {
+    username,
+    opponentUsername,
+    gameMode
+  } = useContext(context)
+  const { gameInstance } = useGame('ticTacToe', gameMode as TGameMode) as { gameInstance: TicTacToeGame }
   const [state, dispatch] = useReducer(reducer, {
     ...gameInstance.state,
     score: {
@@ -28,8 +30,6 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
       draw: 0
     }
   })
-  const { theme, setTheme } = useTheme()
-  const navigate = useNavigate();
 
   const handleClick = (X: number, Y: number) => () => {
     if (state.board[X][Y] || state.winner) return
@@ -51,13 +51,11 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
     return className
   }
 
-  const homeCb = () => { navigate('/') }
   const resetCb = () => {
     gameInstance.resetState()
     const stateUpdate = gameInstance.state
     dispatch({ type: 'STATE_UPDATE', payload: { state: stateUpdate } })
   }
-  const lightModeCb = () => { setTheme(theme === 'dark' ? 'light' : 'dark') }
 
 
   return <div className='TicTacToe'>
@@ -77,7 +75,7 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
       )}
     </div>
     <Switch activePlayer={state.activePlayer} />
-    <InGameOptions homeCb={homeCb} resetCb={resetCb} lightModeCb={lightModeCb} />
+    <InGameOptions resetCb={resetCb} />
     <div className="options">
     </div>
   </div>;

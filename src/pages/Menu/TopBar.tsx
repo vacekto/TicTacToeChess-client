@@ -1,6 +1,6 @@
 import './TopBar.scss'
 import { useContext } from 'react';
-import { context } from '@/util/context/ContextProvider';
+import { context } from '@/util/globalContext/ContextProvider';
 
 interface ITopBarProps {
 
@@ -9,12 +9,16 @@ interface ITopBarProps {
 const TopBar: React.FC<ITopBarProps> = () => {
     const {
         username,
-        setShowUsernameModal
+        updateGlobalState
     } = useContext(context)
 
     const showModal = () => {
-        setShowUsernameModal(true)
+        const stateUpdate = {
+            showUsernameModal: true
+        }
+        updateGlobalState(stateUpdate)
     }
+
     return <div className='TopBar'>
         <div className="username" onClick={showModal}>
             {username ? username : 'Set username'}

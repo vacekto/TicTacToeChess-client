@@ -1,32 +1,35 @@
 import './UsernameModal.scss'
 import { useRef, useContext } from 'react';
-import { context } from '@/util/context/ContextProvider'
+import { context } from '@/util/globalContext/ContextProvider'
 
 interface ITopBarProps {
     visible: boolean
-}   
+}
 
 const TopBar: React.FC<ITopBarProps> = ({ visible }) => {
-    const usernameInputRef = useRef<HTMLInputElement>(null)
-    const checkboxRef = useRef<HTMLInputElement>(null)
-    const { setUsername, setShowUsernameModal } = useContext(context)
+    const usernameInputRef = useRef<HTMLInputElement>({} as HTMLInputElement)
+    const checkboxRef = useRef<HTMLInputElement>({} as HTMLInputElement)
+    const {
+        updateGlobalState,
+        socketProxy
+    } = useContext(context)
 
     const handleSetUsername: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
-        if (e.key === 'Enter') {
-            setUsername(usernameInputRef.current!.value, checkboxRef.current!.checked)
-        }
+        if (e.key !== 'Enter') return
+        const username = usernameInputRef.current.value
+        socketProxy.emit('setUsername', username)
+        if (!checkboxRef.current.checked) return
+        localStorage.setItem('username', username)
     }
 
     const exit = () => {
-        setShowUsernameModal(false)
+        updateGlobalState({ showUsernameModal: false })
     }
 
 
     return <div
         className='UsernameModal'
-        style={visible ? {} : {
-            display: 'none'
-        }}
+        style={visible ? {} : { display: 'none' }}
     >
 
         <div className="content">
