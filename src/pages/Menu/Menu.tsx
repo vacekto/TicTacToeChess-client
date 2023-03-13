@@ -1,4 +1,4 @@
-import './index.scss'
+import './Menu.scss'
 import TopBar from './TopBar';
 import Options from './Options';
 

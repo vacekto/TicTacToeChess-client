@@ -39,15 +39,15 @@ const createGameProxy = (game: TGameInstance, gameMode: TGameMode) => {
     return gameProxy
 }
 
-const useGame: TUseGame = (game, gameMode, size = 12, winCondition = 5, startingPlayer = 'O') => {
+const useGame: TUseGame = (game, gameMode, size?, winCondition?, startingPlayer?) => {
     let gameRef: React.MutableRefObject<TGameInstance | null> = useRef(null)
     if (gameRef.current) return { gameInstance: gameRef.current }
 
     let gameInstance: TGameInstance
 
     if (game === 'chess') gameInstance = new ChessGame()
-    if (game === 'ticTacToe') gameInstance = new TicTacToeGame(size!, winCondition!, startingPlayer!)
-    if (game === 'uTicTacToe') gameInstance = new UTicTacToeGame(startingPlayer!)
+    if (game === 'ticTacToe') gameInstance = new TicTacToeGame(size, winCondition, startingPlayer)
+    if (game === 'uTicTacToe') gameInstance = new UTicTacToeGame(startingPlayer)
 
     const gameProxy = createGameProxy(gameInstance!, gameMode)
     gameRef.current = gameProxy

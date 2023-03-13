@@ -1,8 +1,8 @@
 import './TicTacToe.scss'
-import { useReducer, useContext } from 'react'
+import { useReducer, useContext, useEffect } from 'react'
 import { context } from '@/util/globalContext/ContextProvider'
 import useGame from '@/util/useGame'
-import { TTicTacToeSide, TicTacToeGame, TGameMode } from 'shared'
+import { TTicTacToeSide, TicTacToeGame, TGameMode, ITicTacToeMove, ITicTacToeState } from 'shared'
 import InGameOptions from '@/components/InGameOptions';
 import InGameScore from '@/components/TicTacToeScore';
 import InGameUsername from '@/components/InGameUsername'
@@ -19,7 +19,10 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
   const {
     username,
     opponentUsername,
-    gameMode
+    gameMode,
+    socketProxy,
+    gameSide,
+    updateGlobalState
   } = useContext(context)
   const { gameInstance } = useGame('ticTacToe', gameMode as TGameMode) as { gameInstance: TicTacToeGame }
   const [state, dispatch] = useReducer(reducer, {
@@ -32,10 +35,26 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
   })
 
   const handleClick = (X: number, Y: number) => () => {
-    if (state.board[X][Y] || state.winner) return
-    gameInstance.move([X, Y])
+    if (
+      state.board[X][Y] ||
+      state.winner
+    )
+      return
+    if (
+      gameMode === 'multiplayer' &&
+      state.activePlayer !== gameSide
+    )
+      return
+    const move = { X, Y }
+    gameInstance.move(move)
     const stateUpdate = gameInstance.state
-    dispatch({ type: 'STATE_UPDATE', payload: { state: stateUpdate } })
+    if (gameMode === 'multiplayer') {
+      socketProxy.emit('gameMove', move)
+    }
+    dispatch({
+      type: 'STATE_UPDATE',
+      payload: { state: stateUpdate }
+    })
   }
 
   const renderIcon = (value: TTicTacToeSide | null | 'draw') => {
@@ -56,6 +75,28 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
     const stateUpdate = gameInstance.state
     dispatch({ type: 'STATE_UPDATE', payload: { state: stateUpdate } })
   }
+
+  useEffect(() => {
+
+    socketProxy.on('gameStateUpdate', (state, lastMove) => {
+      gameInstance.move(lastMove as ITicTacToeMove)
+      dispatch({ type: 'STATE_UPDATE', payload: { state: state as ITicTacToeState } })
+    })
+
+    socketProxy.on('opponentLeft', () => {
+      socketProxy.emit('leaveGame')
+      updateGlobalState({ gameName: '' })
+      socketProxy.removeListener('gameStateUpdate')
+    })
+
+
+
+    return () => {
+      socketProxy.emit('leaveGame')
+      socketProxy.removeListener('gameStateUpdate')
+      socketProxy.removeListener('opponentLeft')
+    }
+  }, [])
 
 
   return <div className='TicTacToe'>

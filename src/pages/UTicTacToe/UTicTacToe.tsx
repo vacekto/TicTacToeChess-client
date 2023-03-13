@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import useGame from "@/util/useGame";
 import InGameOptions from '@/components/InGameOptions';
 import InGameScore from '@/components/TicTacToeScore';
@@ -10,6 +10,8 @@ import reducer from './reducer'
 import './UTicTacToe.scss'
 import { context } from '@/util/globalContext/ContextProvider'
 import {
+    IUTicTacToeMove,
+    IUTicTacToeState,
     TGameMode,
     TTicTacToeSide,
     UTicTacToeGame
@@ -26,7 +28,10 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
     const {
         username,
         opponentUsername,
-        gameMode
+        gameMode,
+        socketProxy,
+        gameSide,
+        updateGlobalState,
     } = useContext(context)
     const { gameInstance } = useGame('uTicTacToe', gameMode as TGameMode) as { gameInstance: UTicTacToeGame }
     const [state, dispatch] = useReducer(reducer, {
@@ -62,18 +67,24 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
     const handleClick = (
         SX: number, SY: number, X: number, Y: number
     ) => () => {
-        if (state.board[SX][SY][X][Y] || state.winner) return
+        if (
+            gameMode === 'multiplayer' &&
+            state.activePlayer !== gameSide
+        )
+            return
+        if (state.board[SX][SY][X][Y]) return
+        if (state.winner) return
         if (state.activeSegment) {
             const [A, B] = state.activeSegment
             if (A !== SX || B !== SY) return
         }
-        gameInstance.move(SX, SY, X, Y)
+
+        const move = { SX, SY, X, Y }
+        gameInstance.move(move)
+        if (gameMode === 'multiplayer')
+            socketProxy.emit('gameMove', move)
         const stateUpdate = gameInstance.state
-        console.log(stateUpdate)
-        dispatch({
-            type: 'STATE_UPDATE',
-            payload: { state: stateUpdate }
-        })
+        dispatch({ type: 'STATE_UPDATE', payload: { state: stateUpdate } })
     }
 
     const renderIcon = (value: TTicTacToeSide | null | 'draw') => {
@@ -81,6 +92,28 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
         if (value === 'X') return <CrossSVG />
         return null
     }
+
+    useEffect(() => {
+
+        socketProxy.on('gameStateUpdate', (state, lastMove) => {
+            gameInstance.move(lastMove as IUTicTacToeMove)
+            dispatch({ type: 'STATE_UPDATE', payload: { state: state as IUTicTacToeState } })
+        })
+
+        socketProxy.on('opponentLeft', () => {
+            socketProxy.emit('leaveGame')
+            updateGlobalState({ gameName: '' })
+            socketProxy.removeListener('gameStateUpdate')
+        })
+
+
+
+        return () => {
+            socketProxy.emit('leaveGame')
+            socketProxy.removeListener('gameStateUpdate')
+            socketProxy.removeListener('opponentLeft')
+        }
+    }, [])
 
 
     return <div className='UTicTacToe'>

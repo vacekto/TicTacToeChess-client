@@ -24,7 +24,7 @@ const defaultGlobalState: IGlobalState = {
     opponentGameSide: '',
     username: savedUsername ? savedUsername : '',
     opponentUsername: '',
-    showUsernameModal: false,
+    showUsernameModal: savedUsername ? false : true,
     usernameErrorMsg: '',
     gameName: '',
     gameMode: '',

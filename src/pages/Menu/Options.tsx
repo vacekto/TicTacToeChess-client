@@ -1,5 +1,5 @@
 import './Options.scss'
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { TGameName } from 'shared'
 import { context } from '@/util/globalContext/ContextProvider';
 
@@ -9,18 +9,32 @@ interface IOptionsProps {
 
 const Options: React.FC<IOptionsProps> = () => {
     const [selectedGame, setSelectedGame] = useState<TGameName | ''>('')
-    const { updateGlobalState } = useContext(context)
+    const {
+        updateGlobalState,
+        socketProxy,
+        gameName
+    } = useContext(context)
 
     const selectGame = (gameName: TGameName | '') => () => {
         setSelectedGame(gameName)
     }
 
-    const handleHotseatClick = () => {
+    const handleHotseat = () => {
         updateGlobalState({
             gameName: selectedGame,
             gameMode: 'hotseat'
         })
     }
+
+    const handleFindOpponent = () => {
+        socketProxy.emit('joinLobby', selectedGame as TGameName)
+    }
+
+    useEffect(() => {
+        return () => {
+            socketProxy.emit('leaveLobby')
+        }
+    }, [])
 
     return <div className='Options'>
         {!selectedGame ?
@@ -33,8 +47,8 @@ const Options: React.FC<IOptionsProps> = () => {
             <div className="gameOptionsContainer">
                 <h1>{selectedGame}</h1>
                 <div className="gameOptions">
-                    <div onClick={handleHotseatClick}>Hetseat</div>
-                    <div onClick={() => { }}>Find opponent</div>
+                    <div onClick={handleHotseat}>Hetseat</div>
+                    <div onClick={handleFindOpponent}>Find opponent</div>
                     <div>vs PC</div>
                     <div onClick={selectGame('')}>Back to menu</div>
                 </div>

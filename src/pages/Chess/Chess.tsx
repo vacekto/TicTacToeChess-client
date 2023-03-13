@@ -2,7 +2,7 @@ import './Chess.scss'
 import { useReducer, useContext, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import useGame from '@/util/useGame'
-import { ChessGame, IChessState, TGameMode } from 'shared';
+import { ChessGame, IChessMove, IChessState, TGameMode } from 'shared';
 import InGameOptions from '@/components/InGameOptions';
 import InGameUsername from '@/components/InGameUsername';
 import { context } from '@/util/globalContext/ContextProvider'
@@ -14,10 +14,11 @@ const Chess: React.FC = () => {
     const {
         username,
         opponentUsername,
-        switchLightTheme,
         gameMode,
         gameSide,
-        socketProxy
+        opponentGameSide,
+        socketProxy,
+        updateGlobalState
     } = useContext(context)
     const { gameInstance } = useGame('chess', gameMode as TGameMode) as { gameInstance: ChessGame }
     const [state, dispatch] = useReducer(reducer, {
@@ -25,7 +26,6 @@ const Chess: React.FC = () => {
         selected: null,
         potentialMoves: []
     })
-    const navigate = useNavigate();
 
     const setSquareStyleClass = (X: number, Y: number) => {
         let className = ''
@@ -41,17 +41,29 @@ const Chess: React.FC = () => {
     }
 
     const handleSquareClick = (X: number, Y: number) => () => {
-        const [SE, AP] = [state.selected, state.activePlayer]
-
+        const SE = state.selected
         for (let [A, B] of state.potentialMoves) {
+            if (
+                gameMode === 'multiplayer' &&
+                state.activePlayer !== gameSide
+            )
+                break
             if (A === X && B === Y) {
-                if (SE && state.board[SE[0]][SE[1]][0] !== AP[0]) {
-                    dispatch({ type: 'DESELECT' })
-                    return
+                const move = {
+                    from: {
+                        X: SE![0],
+                        Y: SE![1]
+                    },
+                    to: { X, Y }
                 }
-                gameInstance.move([SE![0], SE![1]], [X, Y])
+                gameInstance.move(move)
+                if (gameMode === 'multiplayer')
+                    socketProxy.emit('gameMove', move)
                 const stateUpdate = gameInstance.state
-                dispatch({ type: 'STATE_UPDATE', payload: { state: stateUpdate } })
+                dispatch({
+                    type: 'STATE_UPDATE',
+                    payload: { state: stateUpdate }
+                })
                 return
             }
         }
@@ -108,9 +120,25 @@ const Chess: React.FC = () => {
     }
 
     useEffect(() => {
-        socketProxy.on('gameStateUpdate', () => {
-            //update state 
+
+        socketProxy.on('gameStateUpdate', (state, lastMove) => {
+            gameInstance.move(lastMove as IChessMove)
+            dispatch({ type: 'STATE_UPDATE', payload: { state: state as IChessState } })
         })
+
+        socketProxy.on('opponentLeft', () => {
+            socketProxy.emit('leaveGame')
+            updateGlobalState({ gameName: '' })
+            socketProxy.removeListener('gameStateUpdate')
+        })
+
+
+
+        return () => {
+            socketProxy.emit('leaveGame')
+            socketProxy.removeListener('gameStateUpdate')
+            socketProxy.removeListener('opponentLeft')
+        }
     }, [])
 
 
@@ -119,12 +147,12 @@ const Chess: React.FC = () => {
 
         <div className="figuresTaken">
             <div className='player1'>
-                {state.figuresTaken.w.map((piece, index) => {
+                {state.figuresTaken.w.map(piece => {
                     return SVG[piece]
                 })}
             </div>
             <div className='player2'>
-                {state.figuresTaken.b.map((piece, index) => {
+                {state.figuresTaken.b.map(piece => {
                     return SVG[piece]
                 })}
             </div>

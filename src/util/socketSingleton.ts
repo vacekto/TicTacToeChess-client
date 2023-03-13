@@ -40,10 +40,10 @@ export const createSocketProxy = (socket: TClientSocket) => {
     })
 
     const socketProxy = new Proxy(socket, {
-        get(target, prop: keyof TClientSocket) {
+        get(target, prop: keyof TClientSocket, receiver) {
             if (prop === 'on') return onProxy
             if (prop === 'emit') return emitProxy
-            return target[prop]
+            return Reflect.get(target, prop, receiver)
         }
     })
 

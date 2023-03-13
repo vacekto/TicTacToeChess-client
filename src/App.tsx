@@ -1,15 +1,18 @@
 import './App.scss';
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useContext } from 'react'
-import Menu from './pages/Menu';
+import Menu from './pages/Menu/Menu';
 import TicTacToe from './pages/TicTacToe/TicTacToe';
 import UTicTacToe from './pages/UTicTacToe/UTicTacToe';
 import { useEffect, useRef } from 'react';
-import { registerDragToScroll, initUsernameFromStorage } from './util/functions'
+import {
+  registerDragToScroll,
+  initUsernameFromStorage,
+  subscribeToSocketEvents
+} from './util/functions'
 import { context } from './util/globalContext/ContextProvider';
 import Chess from './pages/Chess/Chess';
 import UsernameModal from './components/UsernameModal'
-import { IGlobalState } from './util/globalContext/reducer';
 
 function App() {
   const appElement = useRef<HTMLDivElement>(null);
@@ -26,50 +29,20 @@ function App() {
   useEffect(() => {
     registerDragToScroll(appElement.current!)
     initUsernameFromStorage(updateGlobalState, socketProxy)
-
-    socketProxy.on('setUsername', (status, message, username) => {
-      console.log('message: ' + message)
-      const stateUpdate: Partial<IGlobalState> = {}
-
-      if (status === 'error') {
-        stateUpdate.usernameErrorMsg = message
-        stateUpdate.showUsernameModal = true
-        stateUpdate.username = ''
-      }
-      else {
-        stateUpdate.username = username
-        stateUpdate.showUsernameModal = false
-      }
-
-      updateGlobalState(stateUpdate)
-    })
-
-    socketProxy.on('startGame', (gameName, opponentUsername, gameSide) => {
-
-      const opponentGameSide = gameName === 'chess' ?
-        (gameSide === 'w' ? 'b' : 'w') :
-        (gameSide === 'O' ? 'X' : 'O')
-
-      const stateUpdate: Partial<IGlobalState> = {
-        gameName,
-        opponentUsername,
-        gameMode: 'multiplayer',
-        opponentGameSide,
-        gameSide
-      }
-
-      updateGlobalState(stateUpdate)
-    })
-
+    subscribeToSocketEvents(updateGlobalState, socketProxy)
   }, [])
-
 
   useEffect(() => {
     navigate(`/${gameName}`)
   }, [gameName])
 
+  const test = () => {
+    socketProxy.emit('test')
+  }
+
   return (
     <div className="App" ref={appElement} id={theme}>
+      <button onClick={test}>test</button>
       <UsernameModal visible={showUsernameModal} />
       <Routes>
         <Route index element={<Menu />} />
