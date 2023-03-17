@@ -15,11 +15,13 @@ const TopBar: React.FC<ITopBarProps> = ({ visible }) => {
     } = useContext(context)
 
     const handleSetUsername: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
-        if (e.key !== 'Enter') return
         const username = usernameInputRef.current.value
-        socketProxy.emit('setUsername', username)
-        if (!checkboxRef.current.checked) return
-        localStorage.setItem('username', username)
+        if (e.key !== 'Enter' || !username) return
+        if (socketProxy.connected)
+            socketProxy.emit('set_username', username)
+        else socketProxy.connect(username)
+        if (checkboxRef.current.checked)
+            localStorage.setItem('username', username)
     }
 
     const exit = () => {

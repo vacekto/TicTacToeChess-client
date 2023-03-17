@@ -3,16 +3,13 @@ import { useState, useContext, useEffect } from 'react';
 import { TGameName } from 'shared'
 import { context } from '@/util/globalContext/ContextProvider';
 
-interface IOptionsProps {
-
-}
+interface IOptionsProps { }
 
 const Options: React.FC<IOptionsProps> = () => {
     const [selectedGame, setSelectedGame] = useState<TGameName | ''>('')
     const {
         updateGlobalState,
         socketProxy,
-        gameName
     } = useContext(context)
 
     const selectGame = (gameName: TGameName | '') => () => {
@@ -27,12 +24,12 @@ const Options: React.FC<IOptionsProps> = () => {
     }
 
     const handleFindOpponent = () => {
-        socketProxy.emit('joinLobby', selectedGame as TGameName)
+        socketProxy.emit('join_lobby', selectedGame as TGameName)
     }
 
     useEffect(() => {
         return () => {
-            socketProxy.emit('leaveLobby')
+            socketProxy.emit('leave_lobby')
         }
     }, [])
 

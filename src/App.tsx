@@ -5,14 +5,13 @@ import Menu from './pages/Menu/Menu';
 import TicTacToe from './pages/TicTacToe/TicTacToe';
 import UTicTacToe from './pages/UTicTacToe/UTicTacToe';
 import { useEffect, useRef } from 'react';
-import {
-  registerDragToScroll,
-  initUsernameFromStorage,
-  subscribeToSocketEvents
-} from './util/functions'
 import { context } from './util/globalContext/ContextProvider';
 import Chess from './pages/Chess/Chess';
 import UsernameModal from './components/UsernameModal'
+import {
+  registerDragToScroll,
+  subscribeToSocketEvents
+} from './util/functions'
 
 function App() {
   const appElement = useRef<HTMLDivElement>(null);
@@ -28,7 +27,6 @@ function App() {
 
   useEffect(() => {
     registerDragToScroll(appElement.current!)
-    initUsernameFromStorage(updateGlobalState, socketProxy)
     subscribeToSocketEvents(updateGlobalState, socketProxy)
   }, [])
 
@@ -38,11 +36,29 @@ function App() {
 
   const test = () => {
     socketProxy.emit('test')
+
+
+    // fetch('http://localhost:3001/setUsername',
+    //   {
+    //     method: 'POST',
+    //     body: 'some username'
+    //   }
+    // ).then(response => console.log(response.status))
+  }
+
+  const connect = () => {
+    socketProxy.connect('testing')
+  }
+
+  const disconnect = () => {
+    socketProxy.disconnect()
   }
 
   return (
     <div className="App" ref={appElement} id={theme}>
       <button onClick={test}>test</button>
+      <button onClick={connect}>connect</button>
+      <button onClick={disconnect}>disconnect</button>
       <UsernameModal visible={showUsernameModal} />
       <Routes>
         <Route index element={<Menu />} />

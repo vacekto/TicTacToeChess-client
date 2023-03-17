@@ -47,36 +47,25 @@ export const registerDragToScroll = (app: myApp) => {
 
 
 
-export const initUsernameFromStorage: TInitUsernameFromStorage = (updateGlobalState, socket) => {
-    const stateUpdate: Partial<IGlobalState> = {}
-
-    const username = localStorage.getItem('username');
-    if (!username) {
-        stateUpdate.showUsernameModal = true
-        updateGlobalState(stateUpdate)
-        return
-    }
-    socket.emit('setUsername', username)
-}
-
 export const subscribeToSocketEvents: TSubscribeToSocketEvents = (updateGlobalState, socket) => {
-    socket.on('setUsername', (status, message, username) => {
+    socket.on('username_accepted', (username) => {
         const stateUpdate: Partial<IGlobalState> = {}
-
-        if (status === 'error') {
-            stateUpdate.usernameErrorMsg = message
-            stateUpdate.showUsernameModal = true
-            stateUpdate.username = ''
-            updateGlobalState(stateUpdate)
-            return
-        }
 
         stateUpdate.showUsernameModal = false
         stateUpdate.username = username
         updateGlobalState(stateUpdate)
     })
 
-    socket.on('startGame', (gameName, opponentUsername, gameSide) => {
+    socket.on('username_denied', (errorMessage) => {
+        const stateUpdate: Partial<IGlobalState> = {}
+
+        stateUpdate.showUsernameModal = true
+        stateUpdate.username = ''
+        stateUpdate.usernameErrorMsg = errorMessage
+        updateGlobalState(stateUpdate)
+    })
+
+    socket.on('start_game', (gameName, opponentUsername, gameSide) => {
 
         const opponentGameSide: TGameSide = gameName === 'chess' ?
             (gameSide === 'w' ? 'b' : 'w') :
@@ -91,4 +80,17 @@ export const subscribeToSocketEvents: TSubscribeToSocketEvents = (updateGlobalSt
         })
     })
 
+    socket.on('users_online_update', users => {
+        console.log(users)
+    })
+
+    socket.on('connect_error', (err) => {
+        const stateUpdate: Partial<IGlobalState> = {}
+
+        stateUpdate.showUsernameModal = true
+        stateUpdate.username = ''
+        stateUpdate.usernameErrorMsg = err.message
+        updateGlobalState(stateUpdate)
+        console.log(err.message)
+    })
 }

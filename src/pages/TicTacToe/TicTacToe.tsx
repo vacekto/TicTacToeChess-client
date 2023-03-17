@@ -49,7 +49,7 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
     gameInstance.move(move)
     const stateUpdate = gameInstance.state
     if (gameMode === 'multiplayer') {
-      socketProxy.emit('gameMove', move)
+      socketProxy.emit('game_move', move)
     }
     dispatch({
       type: 'STATE_UPDATE',
@@ -78,23 +78,23 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
 
   useEffect(() => {
 
-    socketProxy.on('gameStateUpdate', (state, lastMove) => {
+    socketProxy.on('game_state_update', (state, lastMove) => {
       gameInstance.move(lastMove as ITicTacToeMove)
       dispatch({ type: 'STATE_UPDATE', payload: { state: state as ITicTacToeState } })
     })
 
-    socketProxy.on('opponentLeft', () => {
-      socketProxy.emit('leaveGame')
+    socketProxy.on('opponent_left', () => {
+      socketProxy.emit('leave_game')
       updateGlobalState({ gameName: '' })
-      socketProxy.removeListener('gameStateUpdate')
+      socketProxy.removeListener('game_state_update')
     })
 
 
 
     return () => {
-      socketProxy.emit('leaveGame')
-      socketProxy.removeListener('gameStateUpdate')
-      socketProxy.removeListener('opponentLeft')
+      socketProxy.emit('leave_game')
+      socketProxy.removeListener('game_state_update')
+      socketProxy.removeListener('opponent_left')
     }
   }, [])
 

@@ -3,39 +3,49 @@ import { io, Socket } from 'socket.io-client'
 
 export type TClientSocket = Socket<ServerToClientEvents, ClientToServerEvents>
 
+export interface ISocketProxy extends TClientSocket {
+    connect: (username?: string) => this
+}
+
 const socketSingleton = function () {
     let _instance: TClientSocket | null = null
     return {
         get instance() {
-            if (!_instance) _instance = io("http://localhost:3001")
+            if (_instance) return _instance
+            const username = localStorage.getItem('username')
+            const options = username ?
+                { auth: { username } } :
+                { autoConnect: false }
+
+            _instance = io('http://localhost:3001', options)
             return _instance
-        }
+        },
     }
 }()
 
 export const createSocketProxy = (socket: TClientSocket) => {
 
-    const options = {
-        _canEmit: true
-    }
-
     const onProxy = new Proxy(socket.on, {
         apply(target, thisArg, args) {
-            if (socket.hasListeners(args[0])) return socket
-            return Reflect.apply(target, thisArg, args)
+            if (!socket.hasListeners(args[0]))
+                return Reflect.apply(target, thisArg, args)
+            return socket
         }
     })
 
     const emitProxy = new Proxy(socket.emit, {
         apply(target, thisArg, args) {
-            if (options._canEmit) {
-                options._canEmit = false
-                Reflect.apply(target, thisArg, args)
-                setTimeout(() => {
-                    options._canEmit = true
-                }, 100)
-            }
+            if (socket.connected)
+                return Reflect.apply(target, thisArg, args)
             return socket
+        }
+    })
+
+    const connectProxy = new Proxy(socket.connect, {
+        apply(target, thisArg, args) {
+            const username = args[0]
+            if (username) socket.auth = { username }
+            return Reflect.apply(target, thisArg, [])
         }
     })
 
@@ -43,11 +53,12 @@ export const createSocketProxy = (socket: TClientSocket) => {
         get(target, prop: keyof TClientSocket, receiver) {
             if (prop === 'on') return onProxy
             if (prop === 'emit') return emitProxy
+            if (prop === 'connect') return connectProxy
             return Reflect.get(target, prop, receiver)
         }
     })
 
-    return socketProxy
+    return socketProxy as ISocketProxy
 
 }
 

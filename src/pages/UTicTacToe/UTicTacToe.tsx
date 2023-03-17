@@ -82,7 +82,7 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
         const move = { SX, SY, X, Y }
         gameInstance.move(move)
         if (gameMode === 'multiplayer')
-            socketProxy.emit('gameMove', move)
+            socketProxy.emit('game_move', move)
         const stateUpdate = gameInstance.state
         dispatch({ type: 'STATE_UPDATE', payload: { state: stateUpdate } })
     }
@@ -95,23 +95,23 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
 
     useEffect(() => {
 
-        socketProxy.on('gameStateUpdate', (state, lastMove) => {
+        socketProxy.on('game_state_update', (state, lastMove) => {
             gameInstance.move(lastMove as IUTicTacToeMove)
             dispatch({ type: 'STATE_UPDATE', payload: { state: state as IUTicTacToeState } })
         })
 
-        socketProxy.on('opponentLeft', () => {
-            socketProxy.emit('leaveGame')
+        socketProxy.on('opponent_left', () => {
+            socketProxy.emit('leave_game')
             updateGlobalState({ gameName: '' })
-            socketProxy.removeListener('gameStateUpdate')
+            socketProxy.removeListener('game_state_update')
         })
 
 
 
         return () => {
-            socketProxy.emit('leaveGame')
-            socketProxy.removeListener('gameStateUpdate')
-            socketProxy.removeListener('opponentLeft')
+            socketProxy.emit('leave_game')
+            socketProxy.removeListener('game_state_update')
+            socketProxy.removeListener('opponent_left')
         }
     }, [])
 

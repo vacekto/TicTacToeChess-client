@@ -58,7 +58,7 @@ const Chess: React.FC = () => {
                 }
                 gameInstance.move(move)
                 if (gameMode === 'multiplayer')
-                    socketProxy.emit('gameMove', move)
+                    socketProxy.emit('game_move', move)
                 const stateUpdate = gameInstance.state
                 dispatch({
                     type: 'STATE_UPDATE',
@@ -121,23 +121,23 @@ const Chess: React.FC = () => {
 
     useEffect(() => {
 
-        socketProxy.on('gameStateUpdate', (state, lastMove) => {
+        socketProxy.on('game_state_update', (state, lastMove) => {
             gameInstance.move(lastMove as IChessMove)
             dispatch({ type: 'STATE_UPDATE', payload: { state: state as IChessState } })
         })
 
-        socketProxy.on('opponentLeft', () => {
-            socketProxy.emit('leaveGame')
+        socketProxy.on('opponent_left', () => {
+            socketProxy.emit('leave_game')
             updateGlobalState({ gameName: '' })
-            socketProxy.removeListener('gameStateUpdate')
+            socketProxy.removeListener('game_state_update')
         })
 
 
 
         return () => {
-            socketProxy.emit('leaveGame')
-            socketProxy.removeListener('gameStateUpdate')
-            socketProxy.removeListener('opponentLeft')
+            socketProxy.emit('leave_game')
+            socketProxy.removeListener('game_state_update')
+            socketProxy.removeListener('opponent_left')
         }
     }, [])
 

@@ -1,4 +1,7 @@
-import socketSingleton, { TClientSocket, createSocketProxy } from '../socketSingleton'
+import socketSingleton, {
+    createSocketProxy,
+    ISocketProxy
+} from '../socketSingleton'
 import reducer, {
     IGlobalState,
 } from './reducer'
@@ -13,7 +16,7 @@ import {
 interface IContext extends IGlobalState {
     updateGlobalState: (stateUpdate: Partial<IGlobalState>) => void
     switchLightTheme: () => void
-    socketProxy: TClientSocket
+    socketProxy: ISocketProxy
 }
 
 const savedUsername = localStorage.getItem('username')
@@ -41,7 +44,7 @@ const socketProxy = createSocketProxy(socketSingleton.instance)
 
 const ContextProvider: React.FC<IContextProviderProps> = ({ children }) => {
     const [globalState, dispatch] = useReducer(reducer, defaultGlobalState)
-    const socketProxyRef = useRef<TClientSocket>(socketProxy)
+    const socketProxyRef = useRef<ISocketProxy>(socketProxy)
 
     const updateGlobalState = (stateUpdate: Partial<IGlobalState>) => {
         dispatch({
