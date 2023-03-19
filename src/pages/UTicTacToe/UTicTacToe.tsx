@@ -9,6 +9,7 @@ import CrossSVG from '@/components/icons/CrossSVG';
 import reducer from './reducer'
 import './UTicTacToe.scss'
 import { context } from '@/util/globalContext/ContextProvider'
+import { socketProxy } from '@/util/socketSingleton';
 import {
     IUTicTacToeMove,
     IUTicTacToeState,
@@ -29,7 +30,6 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
         username,
         opponentUsername,
         gameMode,
-        socketProxy,
         gameSide,
         updateGlobalState,
     } = useContext(context)
@@ -100,7 +100,7 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
             dispatch({ type: 'STATE_UPDATE', payload: { state: state as IUTicTacToeState } })
         })
 
-        socketProxy.on('opponent_left', () => {
+        socketProxy.on('leave_game', () => {
             socketProxy.emit('leave_game')
             updateGlobalState({ gameName: '' })
             socketProxy.removeListener('game_state_update')
@@ -111,7 +111,7 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
         return () => {
             socketProxy.emit('leave_game')
             socketProxy.removeListener('game_state_update')
-            socketProxy.removeListener('opponent_left')
+            socketProxy.removeListener('leave_game')
         }
     }, [])
 

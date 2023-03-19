@@ -1,6 +1,7 @@
 import './UsernameModal.scss'
 import { useRef, useContext } from 'react';
 import { context } from '@/util/globalContext/ContextProvider'
+import { socketProxy } from '@/util/socketSingleton';
 
 interface ITopBarProps {
     visible: boolean
@@ -11,14 +12,13 @@ const TopBar: React.FC<ITopBarProps> = ({ visible }) => {
     const checkboxRef = useRef<HTMLInputElement>({} as HTMLInputElement)
     const {
         updateGlobalState,
-        socketProxy
     } = useContext(context)
 
     const handleSetUsername: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
         const username = usernameInputRef.current.value
         if (e.key !== 'Enter' || !username) return
         if (socketProxy.connected)
-            socketProxy.emit('set_username', username)
+            socketProxy.emit('change_username', username)
         else socketProxy.connect(username)
         if (checkboxRef.current.checked)
             localStorage.setItem('username', username)

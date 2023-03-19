@@ -3,6 +3,7 @@ import {
     TGameSide,
     TGameMode,
 } from "shared";
+import { socketProxy } from '@/util/socketSingleton';
 
 
 export interface IGlobalState {
@@ -14,7 +15,8 @@ export interface IGlobalState {
     showUsernameModal: boolean
     gameName: TGameName | ''
     gameMode: TGameMode | ''
-    usernameErrorMsg: string
+    usernameErrorMsg: string,
+    usersOnline: string[]
 };
 
 export type TGlobalStateAction = {
@@ -26,6 +28,13 @@ export type TGlobalStateAction = {
 const reducer = (prevState: IGlobalState, action: TGlobalStateAction) => {
     switch (action.type) {
         case 'STATE_UPDATE':
+
+            if (
+                prevState.gameMode === 'multiplayer' &&
+                !action.payload.stateUpdate.gameMode
+            )
+                socketProxy.emit('leave_game')
+
             return {
                 ...prevState,
                 ...action.payload.stateUpdate

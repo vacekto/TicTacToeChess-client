@@ -50,7 +50,6 @@ export const registerDragToScroll = (app: myApp) => {
 export const subscribeToSocketEvents: TSubscribeToSocketEvents = (updateGlobalState, socket) => {
     socket.on('username_accepted', (username) => {
         const stateUpdate: Partial<IGlobalState> = {}
-
         stateUpdate.showUsernameModal = false
         stateUpdate.username = username
         updateGlobalState(stateUpdate)
@@ -58,7 +57,6 @@ export const subscribeToSocketEvents: TSubscribeToSocketEvents = (updateGlobalSt
 
     socket.on('username_denied', (errorMessage) => {
         const stateUpdate: Partial<IGlobalState> = {}
-
         stateUpdate.showUsernameModal = true
         stateUpdate.username = ''
         stateUpdate.usernameErrorMsg = errorMessage
@@ -66,11 +64,9 @@ export const subscribeToSocketEvents: TSubscribeToSocketEvents = (updateGlobalSt
     })
 
     socket.on('start_game', (gameName, opponentUsername, gameSide) => {
-
         const opponentGameSide: TGameSide = gameName === 'chess' ?
             (gameSide === 'w' ? 'b' : 'w') :
             (gameSide === 'O' ? 'X' : 'O')
-
         updateGlobalState({
             gameName,
             opponentUsername,
@@ -82,15 +78,20 @@ export const subscribeToSocketEvents: TSubscribeToSocketEvents = (updateGlobalSt
 
     socket.on('users_online_update', users => {
         console.log(users)
+        const stateUpdate: Partial<IGlobalState> = {}
+        stateUpdate.usersOnline = users
+        updateGlobalState(stateUpdate)
     })
 
     socket.on('connect_error', (err) => {
+        console.log(err.message)
+
         const stateUpdate: Partial<IGlobalState> = {}
 
         stateUpdate.showUsernameModal = true
         stateUpdate.username = ''
         stateUpdate.usernameErrorMsg = err.message
+
         updateGlobalState(stateUpdate)
-        console.log(err.message)
     })
 }

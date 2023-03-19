@@ -9,6 +9,7 @@ import InGameUsername from '@/components/InGameUsername'
 import Switch from '@/components/Switch';
 import CircleSVG from '@/components/icons/CircleSVG';
 import CrossSVG from '@/components/icons/CrossSVG';
+import { socketProxy } from '@/util/socketSingleton';
 import reducer from './reducer'
 
 interface ITicTacToeProps {
@@ -20,7 +21,6 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
     username,
     opponentUsername,
     gameMode,
-    socketProxy,
     gameSide,
     updateGlobalState
   } = useContext(context)
@@ -83,7 +83,7 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
       dispatch({ type: 'STATE_UPDATE', payload: { state: state as ITicTacToeState } })
     })
 
-    socketProxy.on('opponent_left', () => {
+    socketProxy.on('leave_game', () => {
       socketProxy.emit('leave_game')
       updateGlobalState({ gameName: '' })
       socketProxy.removeListener('game_state_update')
@@ -94,7 +94,7 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
     return () => {
       socketProxy.emit('leave_game')
       socketProxy.removeListener('game_state_update')
-      socketProxy.removeListener('opponent_left')
+      socketProxy.removeListener('leave_game')
     }
   }, [])
 

@@ -3,7 +3,7 @@ import { io, Socket } from 'socket.io-client'
 
 export type TClientSocket = Socket<ServerToClientEvents, ClientToServerEvents>
 
-export interface ISocketProxy extends TClientSocket {
+interface ISocketProxy extends TClientSocket {
     connect: (username?: string) => this
 }
 
@@ -25,6 +25,8 @@ const socketSingleton = function () {
 
 export const createSocketProxy = (socket: TClientSocket) => {
 
+    const options = { canEmit: true }
+
     const onProxy = new Proxy(socket.on, {
         apply(target, thisArg, args) {
             if (!socket.hasListeners(args[0]))
@@ -33,8 +35,16 @@ export const createSocketProxy = (socket: TClientSocket) => {
         }
     })
 
+
     const emitProxy = new Proxy(socket.emit, {
         apply(target, thisArg, args) {
+            if (!options.canEmit) return
+            console.log('emit: ' + args[0])
+            options.canEmit = false
+            setTimeout(() => {
+                options.canEmit = true
+            }, 1000)
+
             if (socket.connected)
                 return Reflect.apply(target, thisArg, args)
             return socket
@@ -50,7 +60,7 @@ export const createSocketProxy = (socket: TClientSocket) => {
     })
 
     const socketProxy = new Proxy(socket, {
-        get(target, prop: keyof TClientSocket, receiver) {
+        get(target, prop, receiver) {
             if (prop === 'on') return onProxy
             if (prop === 'emit') return emitProxy
             if (prop === 'connect') return connectProxy
@@ -59,8 +69,8 @@ export const createSocketProxy = (socket: TClientSocket) => {
     })
 
     return socketProxy as ISocketProxy
-
 }
 
+export const socketProxy = createSocketProxy(socketSingleton.instance)
 
 export default socketSingleton

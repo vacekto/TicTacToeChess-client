@@ -1,8 +1,13 @@
 .Options {
     display: flex;
-    justify-content: center;
-    align-items: center;
     flex-grow: 1;
+
+    .listAndOptions {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-grow: 1;
+    }
 
     .gameList {
         display: flex;

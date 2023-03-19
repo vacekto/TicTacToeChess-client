@@ -1,7 +1,3 @@
-import socketSingleton, {
-    createSocketProxy,
-    ISocketProxy
-} from '../socketSingleton'
 import reducer, {
     IGlobalState,
 } from './reducer'
@@ -16,7 +12,6 @@ import {
 interface IContext extends IGlobalState {
     updateGlobalState: (stateUpdate: Partial<IGlobalState>) => void
     switchLightTheme: () => void
-    socketProxy: ISocketProxy
 }
 
 const savedUsername = localStorage.getItem('username')
@@ -31,6 +26,7 @@ const defaultGlobalState: IGlobalState = {
     usernameErrorMsg: '',
     gameName: '',
     gameMode: '',
+    usersOnline: []
 }
 
 
@@ -40,11 +36,9 @@ interface IContextProviderProps {
     children: ReactNode
 }
 
-const socketProxy = createSocketProxy(socketSingleton.instance)
 
 const ContextProvider: React.FC<IContextProviderProps> = ({ children }) => {
     const [globalState, dispatch] = useReducer(reducer, defaultGlobalState)
-    const socketProxyRef = useRef<ISocketProxy>(socketProxy)
 
     const updateGlobalState = (stateUpdate: Partial<IGlobalState>) => {
         dispatch({
@@ -65,7 +59,6 @@ const ContextProvider: React.FC<IContextProviderProps> = ({ children }) => {
         ...globalState,
         switchLightTheme,
         updateGlobalState,
-        socketProxy: socketProxyRef.current
     }}>
         {children}
     </context.Provider >;

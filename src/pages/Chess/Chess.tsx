@@ -1,6 +1,5 @@
 import './Chess.scss'
 import { useReducer, useContext, useEffect } from 'react';
-import { useNavigate } from "react-router-dom";
 import useGame from '@/util/useGame'
 import { ChessGame, IChessMove, IChessState, TGameMode } from 'shared';
 import InGameOptions from '@/components/InGameOptions';
@@ -9,15 +8,17 @@ import { context } from '@/util/globalContext/ContextProvider'
 import ChessHistory from './ChessHistory';
 import SVG from './icons/ChessPiece'
 import reducer from './reducer'
+import { socketProxy } from '@/util/socketSingleton';
 
 const Chess: React.FC = () => {
+    console.log('render')
+
     const {
         username,
         opponentUsername,
         gameMode,
         gameSide,
         opponentGameSide,
-        socketProxy,
         updateGlobalState
     } = useContext(context)
     const { gameInstance } = useGame('chess', gameMode as TGameMode) as { gameInstance: ChessGame }
@@ -126,18 +127,19 @@ const Chess: React.FC = () => {
             dispatch({ type: 'STATE_UPDATE', payload: { state: state as IChessState } })
         })
 
-        socketProxy.on('opponent_left', () => {
-            socketProxy.emit('leave_game')
-            updateGlobalState({ gameName: '' })
-            socketProxy.removeListener('game_state_update')
+        socketProxy.on('leave_game', () => {
+            updateGlobalState({
+                gameName: '',
+                gameMode: '',
+                gameSide: '',
+                opponentGameSide: '',
+                opponentUsername: '',
+            })
         })
 
-
-
         return () => {
-            socketProxy.emit('leave_game')
             socketProxy.removeListener('game_state_update')
-            socketProxy.removeListener('opponent_left')
+            socketProxy.removeListener('leave_game')
         }
     }, [])
 

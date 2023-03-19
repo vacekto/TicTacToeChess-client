@@ -4,14 +4,13 @@ import { useContext } from 'react'
 import Menu from './pages/Menu/Menu';
 import TicTacToe from './pages/TicTacToe/TicTacToe';
 import UTicTacToe from './pages/UTicTacToe/UTicTacToe';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { context } from './util/globalContext/ContextProvider';
 import Chess from './pages/Chess/Chess';
 import UsernameModal from './components/UsernameModal'
-import {
-  registerDragToScroll,
-  subscribeToSocketEvents
-} from './util/functions'
+import { registerDragToScroll, subscribeToSocketEvents } from './util/functions'
+import socketSingleton, { socketProxy } from '@/util/socketSingleton'
+
 
 function App() {
   const appElement = useRef<HTMLDivElement>(null);
@@ -20,7 +19,6 @@ function App() {
     theme,
     showUsernameModal,
     updateGlobalState,
-    socketProxy,
     gameName,
   } = useContext(context)
 
@@ -34,16 +32,13 @@ function App() {
     navigate(`/${gameName}`)
   }, [gameName])
 
+
+
   const test = () => {
     socketProxy.emit('test')
 
-
-    // fetch('http://localhost:3001/setUsername',
-    //   {
-    //     method: 'POST',
-    //     body: 'some username'
-    //   }
-    // ).then(response => console.log(response.status))
+    const socket = socketSingleton.instance
+    console.log(socket.listeners('leave_game'))
   }
 
   const connect = () => {
