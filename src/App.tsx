@@ -27,6 +27,9 @@ function App() {
   useEffect(() => {
     registerDragToScroll(appElement.current!)
     subscribeToSocketEvents(updateGlobalState, socketProxy)
+    socketProxy.on('disconnect', () => {
+      navigate('/')
+    })
   }, [])
 
   useEffect(() => {
@@ -34,24 +37,8 @@ function App() {
   }, [gameName])
 
 
-
-  const test = () => {
-    socketProxy.emit('test')
-  }
-
-  const connect = () => {
-    socketProxy.connect('testing')
-  }
-
-  const disconnect = () => {
-    socketProxy.disconnect()
-  }
-
   return (
     <div className="App" ref={appElement} id={theme}>
-      <button onClick={test}>test</button>
-      <button onClick={connect}>connect</button>
-      <button onClick={disconnect}>disconnect</button>
       <UsernameModal visible={showUsernameModal} />
       <Routes>
         <Route index element={<Menu />} />

@@ -11,8 +11,6 @@ import reducer from './reducer'
 import { socketProxy } from '@/util/socketSingleton';
 
 const Chess: React.FC = () => {
-    console.log('render')
-
     const {
         username,
         opponentUsername,
@@ -142,6 +140,7 @@ const Chess: React.FC = () => {
             socketProxy.removeListener('leave_game')
         }
     }, [])
+
 
 
     return <div className='Chess'>

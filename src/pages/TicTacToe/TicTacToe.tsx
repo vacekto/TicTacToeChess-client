@@ -84,15 +84,18 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
     })
 
     socketProxy.on('leave_game', () => {
-      socketProxy.emit('leave_game')
-      updateGlobalState({ gameName: '' })
-      socketProxy.removeListener('game_state_update')
+      updateGlobalState({
+        gameName: '',
+        gameMode: '',
+        gameSide: '',
+        opponentGameSide: '',
+        opponentUsername: '',
+      })
     })
 
 
 
     return () => {
-      socketProxy.emit('leave_game')
       socketProxy.removeListener('game_state_update')
       socketProxy.removeListener('leave_game')
     }

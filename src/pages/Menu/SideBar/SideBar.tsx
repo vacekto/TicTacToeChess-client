@@ -44,9 +44,13 @@ const SideBar: React.FC<ISideBarProps> = ({ activeSideBar }) => {
         socketProxy.on('game_invites_update', invites => {
             setGameInvites(invites)
         })
-
+        socketProxy.on('invite_declined', invite => {
+            console.log('invite declined: ' + invite)
+        })
         socketProxy.on('game_invite', handleGameInvite)
-
+        socketProxy.on('invite_expired', () => {
+            console.log('invite expired')
+        })
         socketProxy.emit('fetch_online_users')
         socketProxy.emit('fetch_game_invites')
 
