@@ -20,6 +20,7 @@ function App() {
     showUsernameModal,
     updateGlobalState,
     gameName,
+    username
   } = useContext(context)
 
 
@@ -36,9 +37,6 @@ function App() {
 
   const test = () => {
     socketProxy.emit('test')
-
-    const socket = socketSingleton.instance
-    console.log(socket.listeners('leave_game'))
   }
 
   const connect = () => {

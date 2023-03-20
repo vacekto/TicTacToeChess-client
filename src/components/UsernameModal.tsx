@@ -1,5 +1,5 @@
 import './UsernameModal.scss'
-import { useRef, useContext } from 'react';
+import { useRef, useContext, useEffect } from 'react';
 import { context } from '@/util/globalContext/ContextProvider'
 import { socketProxy } from '@/util/socketSingleton';
 
@@ -12,6 +12,7 @@ const TopBar: React.FC<ITopBarProps> = ({ visible }) => {
     const checkboxRef = useRef<HTMLInputElement>({} as HTMLInputElement)
     const {
         updateGlobalState,
+        showUsernameModal
     } = useContext(context)
 
     const handleSetUsername: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
@@ -28,6 +29,11 @@ const TopBar: React.FC<ITopBarProps> = ({ visible }) => {
         updateGlobalState({ showUsernameModal: false })
     }
 
+
+    useEffect(() => {
+        if (showUsernameModal)
+            usernameInputRef.current.focus()
+    }, [showUsernameModal])
 
     return <div
         className='UsernameModal'

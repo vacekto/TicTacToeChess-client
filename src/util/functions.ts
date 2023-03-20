@@ -76,13 +76,6 @@ export const subscribeToSocketEvents: TSubscribeToSocketEvents = (updateGlobalSt
         })
     })
 
-    socket.on('users_online_update', users => {
-        console.log(users)
-        const stateUpdate: Partial<IGlobalState> = {}
-        stateUpdate.usersOnline = users
-        updateGlobalState(stateUpdate)
-    })
-
     socket.on('connect_error', (err) => {
         console.log(err.message)
 

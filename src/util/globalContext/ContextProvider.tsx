@@ -5,7 +5,6 @@ import {
     createContext,
     ReactNode,
     useReducer,
-    useRef
 } from "react";
 
 
@@ -26,7 +25,6 @@ const defaultGlobalState: IGlobalState = {
     usernameErrorMsg: '',
     gameName: '',
     gameMode: '',
-    usersOnline: []
 }
 
 

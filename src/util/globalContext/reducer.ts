@@ -16,7 +16,6 @@ export interface IGlobalState {
     gameName: TGameName | ''
     gameMode: TGameMode | ''
     usernameErrorMsg: string,
-    usersOnline: string[]
 };
 
 export type TGlobalStateAction = {

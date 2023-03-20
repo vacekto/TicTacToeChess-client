@@ -25,8 +25,6 @@ const socketSingleton = function () {
 
 export const createSocketProxy = (socket: TClientSocket) => {
 
-    const options = { canEmit: true }
-
     const onProxy = new Proxy(socket.on, {
         apply(target, thisArg, args) {
             if (!socket.hasListeners(args[0]))
@@ -38,13 +36,6 @@ export const createSocketProxy = (socket: TClientSocket) => {
 
     const emitProxy = new Proxy(socket.emit, {
         apply(target, thisArg, args) {
-            if (!options.canEmit) return
-            console.log('emit: ' + args[0])
-            options.canEmit = false
-            setTimeout(() => {
-                options.canEmit = true
-            }, 1000)
-
             if (socket.connected)
                 return Reflect.apply(target, thisArg, args)
             return socket
