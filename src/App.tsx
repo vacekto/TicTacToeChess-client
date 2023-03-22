@@ -9,7 +9,8 @@ import { context } from './util/globalContext/ContextProvider';
 import Chess from './pages/Chess/Chess';
 import UsernameModal from './components/UsernameModal'
 import { registerDragToScroll, subscribeToSocketEvents } from './util/functions'
-import socketSingleton, { socketProxy } from '@/util/socketSingleton'
+import { socketProxy } from '@/util/socketSingleton'
+
 
 
 function App() {
@@ -20,7 +21,6 @@ function App() {
     showUsernameModal,
     updateGlobalState,
     gameName,
-    username
   } = useContext(context)
 
 

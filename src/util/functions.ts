@@ -16,8 +16,8 @@ type TSubscribeToSocketEvents = TInitUsernameFromStorage
 export const registerDragToScroll = (app: myApp) => {
     if (app.dragToScrollRegistered) return
     let pos = { top: 0, left: 0, x: 0, y: 0 };
-    app.dragToScrollRegistered = true
     app.addEventListener('mousedown', mouseDownHandler)
+    app.dragToScrollRegistered = true
 
     function mouseDownHandler(event: any) {
         pos = {

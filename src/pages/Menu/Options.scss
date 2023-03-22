@@ -2,29 +2,27 @@
     display: flex;
     flex-grow: 1;
 
+
     .listAndOptions {
         display: flex;
         justify-content: center;
         align-items: center;
         flex-grow: 1;
-    }
+        overflow-y: auto;
+        margin: 80px;
 
-    .gameList {
-        display: flex;
-        width: 80%;
-        justify-content: space-around;
-        flex-wrap: wrap;
-        gap: 30px;
-
-        div {
-            cursor: pointer;
-            width: 150px;
-            height: 150px;
-            border: solid 5px aqua;
-            border-radius: 20px;
+        .gameList {
+            margin-top: 20px;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            width: 80%;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 60px;
+
+            .filler {
+                font-family: LuckyestGuy;
+                font-weight: 600;
+            }
         }
     }
 

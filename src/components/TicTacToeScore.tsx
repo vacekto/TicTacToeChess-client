@@ -1,5 +1,4 @@
 import './TicTacToeScore.scss'
-import { TGameName } from 'shared';
 import CircleSVG from '@/components/icons/CircleSVG';
 import CrossSVG from '@/components/icons/CrossSVG';
 import Scales from '@/components/icons/ScalesSVG';

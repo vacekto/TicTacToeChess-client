@@ -4,6 +4,9 @@ import SideBar from './SideBar/SideBar';
 import { TGameName } from 'shared'
 import { context } from '@/util/globalContext/ContextProvider';
 import { socketProxy } from '@/util/socketSingleton';
+import MenuTicTacToe from '@/components/icons/MenuTicTacToe'
+import MenuChess from '@/components/icons/MenuChess';
+import GameOption from '@/components/GameOption';
 
 interface IOptionsProps {
     setActiveSideBar: React.Dispatch<React.SetStateAction<"gameInvites" | "usersOnline" | null>>
@@ -38,9 +41,24 @@ const Options: React.FC<IOptionsProps> = ({ activeSideBar, setActiveSideBar }) =
         <div className="listAndOptions">
             {!selectedGame ?
                 <div className="gameList">
-                    <div onClick={selectGame('ticTacToe')}>TicTacToe</div>
-                    <div onClick={selectGame('uTicTacToe')}>Ultimate TicTacToe</div>
-                    <div onClick={selectGame('chess')}>Chess</div>
+                    <GameOption
+                        selectGame={selectGame('ticTacToe')}
+                        gameName='TIC TAC TOE'
+                    >
+                        <MenuTicTacToe />
+                    </GameOption>
+                    <GameOption
+                        selectGame={selectGame('uTicTacToe')}
+                        gameName='TIC TAC TOE'
+                    >
+                        <MenuTicTacToe />
+                    </GameOption>
+                    <GameOption
+                        selectGame={selectGame('chess')}
+                        gameName='TIC TAC TOE'
+                    >
+                        <MenuChess />
+                    </GameOption>
                 </div>
                 :
                 <div className="gameOptionsContainer">
