@@ -1,10 +1,22 @@
+@import '@/util/CSS/constants.scss';
+
 .TopBar {
     width: 100%;
-    min-height: 100px;
-    background-color: green;
+    min-height: 80px;
+    font-family: LuckyestGuy;
+    font-size: x-large;
+    background-color: $dark-gray;
 
     display: flex;
     justify-content: space-between;
+    box-sizing: border-box;
+    padding: 0px 50px;
     align-items: center;
+    box-shadow: 0 20px 20px rgb(0 0 0 / 0.3);
     color: white;
+
+    .sideBarOptions{
+        display: flex;
+    }
+
 }

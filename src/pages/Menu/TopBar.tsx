@@ -43,6 +43,10 @@ const TopBar: React.FC<ITopBarProps> = ({ activeSideBar, setActiveSideBar }) => 
             </div>
         </div>
 
+        <div className="appName">
+    my games.. idk
+        </div>
+
         <div className="username" onClick={showModal}>
             {username ? username : 'Set username'}
         </div>
