@@ -6,9 +6,11 @@
     border: solid 7px $dark-gray;
     border-radius: 15px;
     transition: transform .2s;
-
+    background-color: white;
     display: flex;
     flex-direction: column;
+
+    
 
     .icon {
         margin: 10px;
@@ -39,8 +41,6 @@
         }
     }
 }
-
-
 
 .GameOption:hover {
     transform: scale(1.1);

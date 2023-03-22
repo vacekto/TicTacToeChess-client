@@ -2,6 +2,7 @@
     display: flex;
     flex-grow: 1;
 
+   
 
     .listAndOptions {
         display: flex;
@@ -34,3 +35,16 @@
         }
     }
 }
+
+.Options::before {
+    content: "";
+    position: fixed;
+    width: 200%;
+    height: 200%;
+    top: -50%;
+    left: -50%;
+    overflow: auto;
+    z-index: -100;
+    background-image: url("../../util/images/menu.jpeg");
+    transform: rotate(-30deg);
+  }
