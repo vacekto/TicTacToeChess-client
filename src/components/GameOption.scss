@@ -3,7 +3,6 @@
 .GameOption {
     cursor: pointer;
     width: 180px;
-
     border: solid 7px $dark-gray;
     border-radius: 15px;
     transition: transform .2s;
@@ -40,6 +39,8 @@
         }
     }
 }
+
+
 
 .GameOption:hover {
     transform: scale(1.1);

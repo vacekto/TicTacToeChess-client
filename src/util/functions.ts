@@ -88,3 +88,16 @@ export const subscribeToSocketEvents: TSubscribeToSocketEvents = (updateGlobalSt
         updateGlobalState(stateUpdate)
     })
 }
+
+export const handleMenuResize = (element: HTMLDivElement) => {
+    const gameOptions = Array.from(document.getElementsByClassName('GameOption')) as HTMLDivElement[]
+
+    const observer = new ResizeObserver(entries => {
+        const div = entries[0]
+        gameOptions.forEach(option => {
+            option.style.width = div.contentRect.width < 560 ? '150px' : '180px'
+        })
+    })
+
+    observer.observe(element)
+}

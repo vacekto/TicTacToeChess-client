@@ -1,5 +1,5 @@
 import './Options.scss'
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect, useRef } from 'react';
 import SideBar from './SideBar/SideBar';
 import { TGameName } from 'shared'
 import { context } from '@/util/globalContext/ContextProvider';
@@ -7,6 +7,7 @@ import { socketProxy } from '@/util/socketSingleton';
 import MenuTicTacToe from '@/components/icons/MenuTicTacToe'
 import MenuChess from '@/components/icons/MenuChess';
 import GameOption from '@/components/GameOption';
+import { handleMenuResize } from '@/util/functions';
 
 interface IOptionsProps {
     setActiveSideBar: React.Dispatch<React.SetStateAction<"gameInvites" | "usersOnline" | null>>
@@ -15,6 +16,7 @@ interface IOptionsProps {
 
 const Options: React.FC<IOptionsProps> = ({ activeSideBar, setActiveSideBar }) => {
     const [selectedGame, setSelectedGame] = useState<TGameName | ''>('')
+    const gameListRef = useRef<HTMLDivElement>(null)
     const {
         updateGlobalState,
     } = useContext(context)
@@ -34,11 +36,15 @@ const Options: React.FC<IOptionsProps> = ({ activeSideBar, setActiveSideBar }) =
         socketProxy.emit('join_lobby', selectedGame as TGameName)
     }
 
+    useEffect(() => {
+        handleMenuResize(gameListRef.current as HTMLDivElement)
+    }, [])
+
 
 
     return <div className='Options'>
         <SideBar activeSideBar={activeSideBar} />
-        <div className="listAndOptions">
+        <div className="listAndOptions" ref={gameListRef}>
             {!selectedGame ?
                 <div className="gameList">
                     <GameOption
@@ -49,7 +55,7 @@ const Options: React.FC<IOptionsProps> = ({ activeSideBar, setActiveSideBar }) =
                     </GameOption>
                     <GameOption
                         selectGame={selectGame('uTicTacToe')}
-                        gameName='TIC TAC TOE'
+                        gameName='ULTIMATE TIC TAC TOE'
                     >
                         <MenuTicTacToe />
                     </GameOption>
@@ -72,7 +78,7 @@ const Options: React.FC<IOptionsProps> = ({ activeSideBar, setActiveSideBar }) =
                 </div>
             }
         </div>
-    </div>
+    </div >
 };
 
 export default Options;
