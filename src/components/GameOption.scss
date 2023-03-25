@@ -10,8 +10,6 @@
     display: flex;
     flex-direction: column;
 
-    
-
     .icon {
         margin: 10px;
     }
@@ -26,6 +24,8 @@
         justify-content: center;
         position: relative;
         font-family: LuckiestGuy;
+        font-size: large;
+        font-weight: lighter;
 
         .filler {
             position: absolute;

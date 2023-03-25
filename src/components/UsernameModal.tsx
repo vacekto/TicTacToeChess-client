@@ -40,7 +40,7 @@ const TopBar: React.FC<ITopBarProps> = ({ visible }) => {
         style={visible ? {} : { display: 'none' }}
     >
 
-        <div className="content">
+        <div className="container">
             <div className="exit" onClick={exit}>X</div>
             Enter username:
             <input

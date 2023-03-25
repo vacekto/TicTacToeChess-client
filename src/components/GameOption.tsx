@@ -1,6 +1,5 @@
 import './GameOption.scss'
 import { ReactNode } from 'react'
-import { TGameName } from 'shared'
 
 interface IGameOptionProps {
     children: ReactNode,

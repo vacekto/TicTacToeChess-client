@@ -30,6 +30,11 @@ function App() {
     socketProxy.on('disconnect', () => {
       navigate('/')
     })
+
+    return () => {
+      socketProxy.removeAllListeners()
+    }
+
   }, [])
 
   useEffect(() => {

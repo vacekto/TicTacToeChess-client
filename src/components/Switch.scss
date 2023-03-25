@@ -43,7 +43,7 @@ $border-light: #a4b5b844;
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 15;
+            z-index: 2;
         }
 
         .left {
@@ -75,7 +75,7 @@ $border-light: #a4b5b844;
         justify-content: center;
         align-items: center;
         border-radius: 50%;
-        z-index: 10;
+        z-index: 1;
 
         .indicator {
             position: absolute;

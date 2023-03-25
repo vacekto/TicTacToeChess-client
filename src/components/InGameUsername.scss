@@ -1,5 +1,20 @@
+@import '@/util/CSS/constants.scss';
+
 .InGameUsername {
     width: 100%;
     display: flex;
     justify-content: space-between;
+    font-family: LuckiestGuy;
+    font-size: large;
+    color: $dark-gray;
+    border: 1px solid black;
+
+    .playerInfo {
+        display: flex;
+
+        .icon {
+            height: 20px;
+            width: 20px;
+        }
+    }
 }

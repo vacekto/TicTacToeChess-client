@@ -10,13 +10,13 @@ import SVG from './icons/ChessPiece'
 import reducer from './reducer'
 import { socketProxy } from '@/util/socketSingleton';
 
+
 const Chess: React.FC = () => {
     const {
         username,
         opponentUsername,
         gameMode,
         gameSide,
-        opponentGameSide,
         updateGlobalState
     } = useContext(context)
     const { gameInstance } = useGame('chess', gameMode as TGameMode) as { gameInstance: ChessGame }
@@ -145,7 +145,6 @@ const Chess: React.FC = () => {
 
     return <div className='Chess'>
         <InGameUsername username={username} opponentUsername={opponentUsername} />
-
         <div className="figuresTaken">
             <div className='player1'>
                 {state.figuresTaken.w.map(piece => {
@@ -174,12 +173,14 @@ const Chess: React.FC = () => {
             })}
         </div>
         <InGameOptions resetCb={resetCb} />
-        <ChessHistory
-            backwardCb={backwardCb}
-            forwardCb={forwardCb}
-            fastBackwardCb={fastBackwardCb}
-            fastForwardCb={fastForwardCb}
-        />
+        {state.winner ?
+            <ChessHistory
+                backwardCb={backwardCb}
+                forwardCb={forwardCb}
+                fastBackwardCb={fastBackwardCb}
+                fastForwardCb={fastForwardCb}
+            /> : null
+        }
     </div>;
 };
 

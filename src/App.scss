@@ -7,11 +7,20 @@
   overflow: auto;
   overscroll-behavior: contain;
   overflow: hidden;
+
 }
 
-@font-face {
-  font-family: "LuckyestGuy";
-  src: url('util/fonts/LuckiestGuy-Regular.ttf');
-  font-weight: 600;
-  font-style: normal;
+
+.App::before {
+  content: "";
+  position: fixed;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  overflow: auto;
+  z-index: -1;
+  background-image: url("./util/images/menu.jpeg");
+  transform: rotate(-30deg);
+  background-position: top;
 }

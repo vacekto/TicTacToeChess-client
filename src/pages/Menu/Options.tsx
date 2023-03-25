@@ -8,6 +8,7 @@ import MenuTicTacToe from '@/components/icons/MenuTicTacToe'
 import MenuChess from '@/components/icons/MenuChess';
 import GameOption from '@/components/GameOption';
 import { handleMenuResize } from '@/util/functions';
+import CustomButton from '@/components/CustomButton';
 
 interface IOptionsProps {
     setActiveSideBar: React.Dispatch<React.SetStateAction<"gameInvites" | "usersOnline" | null>>
@@ -70,10 +71,10 @@ const Options: React.FC<IOptionsProps> = ({ activeSideBar, setActiveSideBar }) =
                 <div className="gameOptionsContainer">
                     <h1>{selectedGame}</h1>
                     <div className="gameOptions">
-                        <div onClick={handleHotseat}>Hetseat</div>
-                        <div onClick={handleFindOpponent}>Find opponent</div>
-                        <div>vs PC</div>
-                        <div onClick={selectGame('')}>Back to menu</div>
+                        <CustomButton callback={handleHotseat}>Hetseat</CustomButton>
+                        <CustomButton callback={handleFindOpponent}>Find opponent</CustomButton>
+                        <CustomButton>vs PC</CustomButton>
+                        <CustomButton callback={selectGame('')}>Back to menu</CustomButton>
                     </div>
                 </div>
             }

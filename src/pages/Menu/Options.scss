@@ -1,8 +1,8 @@
 .Options {
     display: flex;
     flex-grow: 1;
-
-   
+    font-family: 'LuckiestGuy';
+    position: relative;
 
     .listAndOptions {
         display: flex;
@@ -20,7 +20,7 @@
             gap: 60px;
 
             .filler {
-                font-family: LuckyestGuy;
+                font-family: LuckiestGuy;
                 font-weight: 600;
                 text-align: center;
             }
@@ -28,23 +28,21 @@
     }
 
     .gameOptionsContainer {
+        h1 {
+            text-align: center
+        }
+
         .gameOptions {
-            div {
-                cursor: pointer;
+            display: flex;
+            flex-direction: column;
+
+
+            button {
+                margin: 10px;
+                width: 300px;
+                height: 50px;
+                font-size: large;
             }
         }
     }
 }
-
-.Options::before {
-    content: "";
-    position: fixed;
-    width: 200%;
-    height: 200%;
-    top: -50%;
-    left: -50%;
-    overflow: auto;
-    z-index: -100;
-    background-image: url("../../util/images/menu.jpeg");
-    transform: rotate(-30deg);
-  }
