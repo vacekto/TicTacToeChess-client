@@ -41,9 +41,13 @@ function App() {
     navigate(`/${gameName}`)
   }, [gameName])
 
+  const test = () => {
+    socketProxy.emit('test')
+  }
 
   return (
     <div className="App" ref={appElement} id={theme}>
+      <button onClick={test}>test</button>
       <UsernameModal visible={showUsernameModal} />
       <Routes>
         <Route index element={<Menu />} />

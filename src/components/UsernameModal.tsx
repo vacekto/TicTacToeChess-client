@@ -1,5 +1,5 @@
 import './UsernameModal.scss'
-import { useRef, useContext, useEffect } from 'react';
+import { useRef, useContext, useEffect, useState } from 'react';
 import { context } from '@/util/globalContext/ContextProvider'
 import { socketProxy } from '@/util/socketSingleton';
 
@@ -10,6 +10,7 @@ interface ITopBarProps {
 const TopBar: React.FC<ITopBarProps> = ({ visible }) => {
     const usernameInputRef = useRef<HTMLInputElement>({} as HTMLInputElement)
     const checkboxRef = useRef<HTMLInputElement>({} as HTMLInputElement)
+    const [focused, setFocused] = useState<Boolean>(false)
     const {
         updateGlobalState,
         showUsernameModal
@@ -31,6 +32,15 @@ const TopBar: React.FC<ITopBarProps> = ({ visible }) => {
 
 
     useEffect(() => {
+        usernameInputRef.current.addEventListener('focusin', () => {
+            setFocused(true)
+        })
+
+        usernameInputRef.current.addEventListener('focusout', () => {
+            setFocused(false)
+        })
+
+
         if (showUsernameModal)
             usernameInputRef.current.focus()
     }, [showUsernameModal])
@@ -42,12 +52,19 @@ const TopBar: React.FC<ITopBarProps> = ({ visible }) => {
 
         <div className="container">
             <div className="exit" onClick={exit}>X</div>
-            Enter username:
-            <input
-                ref={usernameInputRef}
-                onKeyUp={handleSetUsername}
-                type="text"
-            />
+            <div className="input">
+                <div className="label">
+                    <div className="username">Username</div>
+                    <div className="star">*</div>
+
+                </div>
+                <input
+                    ref={usernameInputRef}
+                    onKeyUp={handleSetUsername}
+                    type="text"
+                    className={focused ? 'focused' : ''}
+                />
+            </div>
             <div>
                 remember username:
                 <input

@@ -15,6 +15,41 @@
         background-color: white;
         border: 3px solid black;
 
+        .input {
+            position: relative;
+            margin: 50px 0px 0px 80px;
+
+            .label {
+                font-size: small;
+                display: flex;
+                font-family: sans-serif;
+                position: absolute;
+                background-color: white;
+                top: -12px;
+                left: 10px;
+                padding: 8px 5px 0px 5px;
+
+                .star {
+                    margin-left: 5px;
+                }
+            }
+
+            input {
+                font-size: medium;
+                border-radius: 5px;
+                height: 35px;
+                width: 180px;
+                padding: 15px 10px 3px 10px;
+                transition: all 2s linear;
+                border: 1px solid rgb(139, 139, 139);
+
+            }
+
+            .focused{
+                border: 2px solid black ;
+            }
+        }
+
         .exit {
             position: absolute;
             top: 0;
