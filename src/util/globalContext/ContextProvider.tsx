@@ -37,7 +37,6 @@ interface IContextProviderProps {
 
 const ContextProvider: React.FC<IContextProviderProps> = ({ children }) => {
     const [globalState, dispatch] = useReducer(reducer, defaultGlobalState)
-
     const updateGlobalState = (stateUpdate: Partial<IGlobalState>) => {
         dispatch({
             type: 'STATE_UPDATE',

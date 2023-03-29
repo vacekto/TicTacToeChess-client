@@ -47,7 +47,7 @@ function App() {
 
   return (
     <div className="App" ref={appElement} id={theme}>
-      <button onClick={test}>test</button>
+      <button className='customButton' onClick={test}>test</button>
       <UsernameModal visible={showUsernameModal} />
       <Routes>
         <Route index element={<Menu />} />

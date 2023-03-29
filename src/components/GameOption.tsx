@@ -15,7 +15,12 @@ const GameOption: React.FC<IGameOptionProps> = ({ children, selectGame, gameName
         </div>
         <div className='gameName'>
             <div className="filler">
-                {gameName}
+                {gameName === 'ULTIMATE TIC TAC TOE' ?
+                    <div>
+                        <div>ULTIMATE</div>
+                        <div>TIC TAC TOE</div>
+                    </div>
+                    : gameName}
             </div>
         </div>
     </div>;

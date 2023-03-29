@@ -2,6 +2,9 @@ import './UsernameModal.scss'
 import { useRef, useContext, useEffect, useState } from 'react';
 import { context } from '@/util/globalContext/ContextProvider'
 import { socketProxy } from '@/util/socketSingleton';
+import Checkbox from '@/util/svg/components/check';
+import CrossSVG from './icons/CrossSVG';
+import Modal from './Modal';
 
 interface ITopBarProps {
     visible: boolean
@@ -9,7 +12,7 @@ interface ITopBarProps {
 
 const TopBar: React.FC<ITopBarProps> = ({ visible }) => {
     const usernameInputRef = useRef<HTMLInputElement>({} as HTMLInputElement)
-    const checkboxRef = useRef<HTMLInputElement>({} as HTMLInputElement)
+    const [rememberUsername, setRememberUsername] = useState<boolean>(false)
     const [focused, setFocused] = useState<Boolean>(false)
     const {
         updateGlobalState,
@@ -22,7 +25,7 @@ const TopBar: React.FC<ITopBarProps> = ({ visible }) => {
         if (socketProxy.connected)
             socketProxy.emit('change_username', username)
         else socketProxy.connect(username)
-        if (checkboxRef.current.checked)
+        if (rememberUsername)
             localStorage.setItem('username', username)
     }
 
@@ -30,6 +33,11 @@ const TopBar: React.FC<ITopBarProps> = ({ visible }) => {
         updateGlobalState({ showUsernameModal: false })
     }
 
+    const toggleCheck = () => {
+        setRememberUsername(prevState => {
+            return prevState === true ? false : true
+        })
+    }
 
     useEffect(() => {
         usernameInputRef.current.addEventListener('focusin', () => {
@@ -45,16 +53,15 @@ const TopBar: React.FC<ITopBarProps> = ({ visible }) => {
             usernameInputRef.current.focus()
     }, [showUsernameModal])
 
-    return <div
-        className='UsernameModal'
-        style={visible ? {} : { display: 'none' }}
-    >
-
-        <div className="container">
-            <div className="exit" onClick={exit}>X</div>
-            <div className="input">
+    return <Modal visible={visible}>
+        <div className="UsernameModal">
+            <h2>Change username</h2>
+            <div className="exit" onClick={exit}>
+                <CrossSVG />
+            </div>
+            <div className={"input " + (focused ? 'focused' : '')}>
                 <div className="label">
-                    <div className="username">Username</div>
+                    <div className="username">Display name</div>
                     <div className="star">*</div>
 
                 </div>
@@ -62,18 +69,29 @@ const TopBar: React.FC<ITopBarProps> = ({ visible }) => {
                     ref={usernameInputRef}
                     onKeyUp={handleSetUsername}
                     type="text"
-                    className={focused ? 'focused' : ''}
                 />
             </div>
-            <div>
-                remember username:
-                <input
-                    type="checkbox"
-                    ref={checkboxRef}
-                />
+            <div className='remember'>
+                <div
+                    className={"label " + (rememberUsername ? 'checked' : '')}
+                    onClick={toggleCheck}>
+                    Remember username:
+                </div>
+                <div
+                    className={"checkbox " + (rememberUsername ? 'checked' : '')}
+                    onClick={toggleCheck}
+                >
+                    <Checkbox />
+                </div>
+
             </div>
-        </div>
-    </div >;
+            <div className="buttonContainer">
+                <button className='customButton'>Submit</button>
+            </div>
+
+        </div >;
+    </Modal>
+
 };
 
 export default TopBar;

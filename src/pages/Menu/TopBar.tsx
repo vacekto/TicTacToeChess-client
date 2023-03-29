@@ -1,7 +1,6 @@
 import './TopBar.scss'
 import { useContext } from 'react';
 import { context } from '@/util/globalContext/ContextProvider';
-import CustomButton from '@/components/CustomButton'
 
 interface ITopBarProps {
     setActiveSideBar: React.Dispatch<React.SetStateAction<"gameInvites" | "usersOnline" | null>>
@@ -48,11 +47,9 @@ const TopBar: React.FC<ITopBarProps> = ({ activeSideBar, setActiveSideBar }) => 
             <div className="username" onClick={showModal}>
                 {username}
             </div> :
-            <CustomButton>
-                'Set username'
-            </CustomButton>
+            <button className='customButton'>Set username</ button>
         }
-    </div >;
+            </div >;
 };
 
-export default TopBar;
+                export default TopBar;

@@ -25,7 +25,6 @@ const SideBar: React.FC<ISideBarProps> = ({ activeSideBar }) => {
 
     const handleGameInvite = (invite: IGameInvite) => {
         setGameInvites(prevState => {
-            console.log('prevstate: ' + prevState)
             const index = prevState.findIndex(inv => {
                 return inv.id === invite.id
             })

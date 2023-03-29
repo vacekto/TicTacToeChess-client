@@ -14,7 +14,12 @@ const User: React.FC<IUserProps> = ({ username }) => {
             <div className="username">
                 {username}
             </div>
-            <button onClick={handleInvite}>invite</button>
+            <button
+                className='customButton'
+                onClick={handleInvite}
+            >
+                invite
+            </button>
         </div>
     );
 }

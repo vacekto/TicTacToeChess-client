@@ -5,4 +5,21 @@ $light-player1: #39bcd4;
 $dark-player1: red;
 $dark-player2: green;
 $dark-gray: #2d3e50;
-$light-green: #039683;
+$light-green: #17bb9c;
+
+
+.customButton {
+    font-size: 16px;
+    font-family: sans-serif;
+    font-weight: bold;
+    border: none;
+    background-color: $light-green;
+    color: white;
+    padding: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.customButton:hover {
+    background-color: #0b947b;
+}
