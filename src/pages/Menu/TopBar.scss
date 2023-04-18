@@ -1,5 +1,7 @@
 @import '@/util/CSS/constants.scss';
 
+
+
 .TopBar {
     width: 100%;
     min-height: 80px;
@@ -15,28 +17,84 @@
     box-shadow: 0 20px 20px rgb(0 0 0 / 0.3);
     color: white;
 
-    div {
-        cursor: pointer;
-
-    }
-
-    .usersOnline:hover {
-        text-shadow: 0px 0px 10px rgb(196, 196, 196)
-    }
-
     .username:hover {
-        text-shadow: 0px 0px 10px rgb(196, 196, 196)
-    }
-
-    .gameInvites:hover {
-        text-shadow: 0px 0px 10px rgb(196, 196, 196)
+        text-shadow: 0px 0px 10px rgb(196, 196, 196);
+        cursor: pointer;
     }
 
     .sideBarOptions {
         display: flex;
+        align-items: center;
+        position: relative;
+
+        div {
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+
+            svg {
+                fill: white;
+            }
+        }
+
+        .active {
+            svg {
+                fill: white;
+            }
+        }
+
+        div:hover {
+            svg {
+                fill: rgb(211, 211, 211);
+            }
+        }
+
+        .usersOnline {
+            margin-right: 30px;
+            padding-top: 4px;
+        }
 
         .gameInvites {
-            margin-right: 40px;
+            position: relative;
+
+            .invitesCount {
+                font-family: sans-serif;
+                font-size: x-small;
+                position: absolute;
+                top: -8px;
+                right: -10px;
+                min-width: 18px;
+                height: 18px;
+                width: fit-content;
+                border-radius: 18px;
+                background-color: red;
+
+                div {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    width: 100%;
+                    height: 100%;
+                    padding: 2px;
+                    box-sizing: border-box;
+                }
+            }
+        }
+
+        .indicatorContainer {
+            position: absolute;
+            bottom: -5px;
+            width: 36px;
+            height: 3px;
+            transition: .2s;
+
+            .indicator {
+                border-radius: 3px;
+                height: 100%;
+                width: 100%;
+                background-color: white;
+                transition: .2s;
+            }
         }
     }
 }

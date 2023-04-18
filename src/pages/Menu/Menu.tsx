@@ -1,14 +1,16 @@
 import './Menu.scss'
 import TopBar from './TopBar';
 import Options from './Options';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface IMenuProps {
 
 }
 
-const Menu: React.FC<IMenuProps> = (props) => {
+const Menu: React.FC<IMenuProps> = () => {
     const [activeSideBar, setActiveSideBar] = useState<'gameInvites' | 'usersOnline' | null>(null)
+
+
 
     return <div className='Menu'>
         <TopBar

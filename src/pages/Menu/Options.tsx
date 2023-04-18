@@ -2,10 +2,10 @@ import './Options.scss'
 import { useState, useContext, useEffect, useRef } from 'react';
 import SideBar from './SideBar/SideBar';
 import { TGameName } from 'shared'
-import { context } from '@/util/globalContext/ContextProvider';
+import { context } from '@/context/GlobalStateProvider';
 import { socketProxy } from '@/util/socketSingleton';
-import MenuTicTacToe from '@/components/icons/MenuTicTacToe'
-import MenuChess from '@/components/icons/MenuChess';
+import MenuTicTacToe from '@/util/svg/components/MenuTicTacToe'
+import MenuChess from '@/util/svg/components/MenuChess';
 import GameOption from '@/components/GameOption';
 import { handleMenuResize } from '@/util/functions';
 
@@ -17,9 +17,8 @@ interface IOptionsProps {
 const Options: React.FC<IOptionsProps> = ({ activeSideBar, setActiveSideBar }) => {
     const [selectedGame, setSelectedGame] = useState<TGameName | ''>('')
     const gameListRef = useRef<HTMLDivElement>(null)
-    const {
-        updateGlobalState,
-    } = useContext(context)
+    const { updateGlobalState, } = useContext(context)
+
 
     const selectGame = (gameName: TGameName | '') => () => {
         setSelectedGame(gameName)
@@ -41,7 +40,6 @@ const Options: React.FC<IOptionsProps> = ({ activeSideBar, setActiveSideBar }) =
     }, [])
 
 
-
     return <div className='Options'>
         <SideBar activeSideBar={activeSideBar} />
         <div className="listAndOptions" ref={gameListRef}>
@@ -61,7 +59,7 @@ const Options: React.FC<IOptionsProps> = ({ activeSideBar, setActiveSideBar }) =
                     </GameOption>
                     <GameOption
                         selectGame={selectGame('chess')}
-                        gameName='TIC TAC TOE'
+                        gameName='CHESS'
                     >
                         <MenuChess />
                     </GameOption>

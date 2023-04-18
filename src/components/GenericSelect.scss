@@ -1,0 +1,125 @@
+@import '@/util/CSS/constants.scss';
+
+$option-width: 200px;
+$option-height: 35px;
+
+.GenericSelect {
+    position: relative;
+    width: $option-width;
+    box-sizing: border-box;
+    margin: 5px;
+
+    .option {
+        cursor: pointer;
+        height: $option-height;
+        display: flex;
+        padding: 5px;
+        background-color: white;
+
+        &:hover {
+            background-color: #f7f7f7;
+        }
+
+        &.active {
+            background-color: #e5e5e5;
+        }
+
+        .description {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            display: block;
+            margin: auto;
+            margin-left: 10px;
+            min-width: $option-height - 15px;
+            height: $option-height - 15px;
+
+            line-height: $option-height - 15px;
+
+            .CircleSVG {
+                stroke: $light-player1
+            }
+
+            .CrossSVG {
+                stroke: $light-player2
+            }
+
+        }
+    }
+
+    .selected {
+        border: 1px solid rgb(206, 206, 206);
+        border-radius: 5px;
+
+        .arrowhead {
+            min-width: $option-height;
+            padding: 10px;
+            box-sizing: border-box;
+            transition: transform .1s;
+        }
+
+    }
+
+
+    .options {
+        border: 1px solid rgb(206, 206, 206);
+        margin-top: 5px;
+        position: absolute;
+        max-height: 0px;
+        transition: all .13s;
+        opacity: 0;
+        box-sizing: border-box;
+        border-radius: 5px;
+        width: 100%;
+        overflow: hidden;
+    }
+
+
+
+
+    &.extended {
+        .arrowhead {
+            transform: rotate(180deg);
+        }
+
+        .options {
+            max-height: 200px;
+            overflow: auto;
+            opacity: 1;
+            z-index: 2;
+        }
+    }
+
+    ::-webkit-scrollbar {
+        position: absolute;
+        width: 8px;
+        border-radius: 8px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: #b4b4b4;
+        border-radius: 8px;
+        margin: 2px;
+        width: 2px;
+        cursor: pointer;
+
+        &:hover {
+            background-color: #888888;
+        }
+    }
+
+    .exitBackground {
+        position: fixed;
+        z-index: 1;
+        width: 100vw;
+        height: 100vh;
+        top: 0;
+        left: 0;
+        background-color: rgba(172, 255, 47, 0.212);
+
+        &.off {
+            display: none;
+        }
+    }
+
+}

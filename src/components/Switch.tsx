@@ -1,7 +1,7 @@
 import './Switch.scss'
 import { useState, useEffect } from 'react'
-import CircleSVG from '@/components/icons/CircleSVG';
-import CrossSVG from '@/components/icons/CrossSVG';
+import CircleSVG from '@/util/svg/components/CircleSVG';
+import CrossSVG from '@/util/svg/components/CrossSVG';
 
 
 interface ISwitchProps {

@@ -4,11 +4,11 @@ import InGameOptions from '@/components/InGameOptions';
 import InGameScore from '@/components/TicTacToeScore';
 import InGameUsername from "@/components/InGameUsername";
 import Switch from '@/components/Switch';
-import CircleSVG from '@/components/icons/CircleSVG';
-import CrossSVG from '@/components/icons/CrossSVG';
+import CircleSVG from '@/util/svg/components/CircleSVG';
+import CrossSVG from '@/util/svg/components/CrossSVG';
 import reducer from './reducer'
 import './UTicTacToe.scss'
-import { context } from '@/util/globalContext/ContextProvider'
+import { context } from '@/context/GlobalStateProvider'
 import { socketProxy } from '@/util/socketSingleton';
 import {
     IUTicTacToeMove,

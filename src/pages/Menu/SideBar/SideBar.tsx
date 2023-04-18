@@ -1,14 +1,7 @@
 import './SideBar.scss'
-import { socketProxy } from '@/util/socketSingleton'
 import User from './User'
-import {
-    CSSProperties,
-    useState,
-    useEffect,
-    useContext
-} from 'react'
-import { context } from '@/util/globalContext/ContextProvider'
-import { IGameInvite } from 'shared'
+import { CSSProperties, useContext, useRef } from 'react'
+import { context } from '@/context/GlobalStateProvider'
 import { v4 as uuidv4 } from 'uuid';
 import GameInvite from './GameInvite'
 
@@ -17,59 +10,17 @@ interface ISideBarProps {
 }
 
 const SideBar: React.FC<ISideBarProps> = ({ activeSideBar }) => {
-    const [usersOnline, setUsersOnline] = useState<string[]>([])
-    const [gameInvites, setGameInvites] = useState<IGameInvite[]>([])
-    const { username } = useContext(context)
+    const { username, usersOnline, gameInvites } = useContext(context)
     const styles: CSSProperties = activeSideBar ? {} : { display: 'none' }
-
-
-    const handleGameInvite = (invite: IGameInvite) => {
-        setGameInvites(prevState => {
-            const index = prevState.findIndex(inv => {
-                return inv.id === invite.id
-            })
-            if (index === -1) return [...prevState, invite]
-            return [...prevState]
-        })
-    }
-
-
-
-    useEffect(() => {
-        socketProxy.on('online_users_update', users => {
-            setUsersOnline(users)
-        })
-
-        socketProxy.on('game_invites_update', invites => {
-            setGameInvites(invites)
-        })
-        socketProxy.on('invite_declined', invite => {
-            console.log('invite declined: ' + invite)
-        })
-        socketProxy.on('game_invite', handleGameInvite)
-        socketProxy.on('invite_expired', () => {
-            console.log('invite expired')
-        })
-        socketProxy.emit('fetch_online_users')
-        socketProxy.emit('fetch_game_invites')
-
-        return () => {
-            socketProxy.removeListener('online_users_update')
-            socketProxy.removeListener('game_invites_update')
-            socketProxy.removeListener('game_invite')
-        }
-
-    }, [])
-
-
 
     return (
         <div
             className='SideBar'
             style={styles}
         >
-            {activeSideBar}
-
+            <div className="activeBarName">
+                {activeSideBar === 'usersOnline' ? 'Users online' : 'Game invitations'}
+            </div>
             {activeSideBar === 'gameInvites' ?
                 gameInvites.map(invite => {
                     return <GameInvite
@@ -78,10 +29,10 @@ const SideBar: React.FC<ISideBarProps> = ({ activeSideBar }) => {
                     />
                 })
                 :
-                usersOnline.map(user => {
+                usersOnline.map((user, userIndex) => {
                     return username === user ? null :
                         <User
-                            key={uuidv4()}
+                            key={userIndex}
                             username={user}
                         />
                 })

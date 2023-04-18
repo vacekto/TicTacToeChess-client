@@ -1,16 +1,14 @@
 import './UsernameModal.scss'
-import { useRef, useContext, useEffect, useState } from 'react';
-import { context } from '@/util/globalContext/ContextProvider'
+import { useRef, useContext, useEffect, useState, KeyboardEvent } from 'react';
+import { context } from '@/context/GlobalStateProvider'
 import { socketProxy } from '@/util/socketSingleton';
-import Checkbox from '@/util/svg/components/check';
-import CrossSVG from './icons/CrossSVG';
-import Modal from './Modal';
+import Checkbox from '@/util/svg/components/Check';
+import GenericModal from './GenericModal';
 
 interface ITopBarProps {
-    visible: boolean
 }
 
-const TopBar: React.FC<ITopBarProps> = ({ visible }) => {
+const TopBar: React.FC<ITopBarProps> = () => {
     const usernameInputRef = useRef<HTMLInputElement>({} as HTMLInputElement)
     const [rememberUsername, setRememberUsername] = useState<boolean>(false)
     const [focused, setFocused] = useState<Boolean>(false)
@@ -19,14 +17,26 @@ const TopBar: React.FC<ITopBarProps> = ({ visible }) => {
         showUsernameModal
     } = useContext(context)
 
-    const handleSetUsername: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
-        const username = usernameInputRef.current.value
-        if (e.key !== 'Enter' || !username) return
+
+    const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+        if (e.key !== 'Enter') return
+
+        const username = usernameInputRef.current.value.trim()
+        if (
+            !username ||
+            username.length > 15 ||
+            username.includes('  ')
+        ) {
+            console.log('chyba')
+            return
+        }
         if (socketProxy.connected)
             socketProxy.emit('change_username', username)
         else socketProxy.connect(username)
         if (rememberUsername)
             localStorage.setItem('username', username)
+        return
+
     }
 
     const exit = () => {
@@ -53,12 +63,11 @@ const TopBar: React.FC<ITopBarProps> = ({ visible }) => {
             usernameInputRef.current.focus()
     }, [showUsernameModal])
 
-    return <Modal visible={visible}>
-        <div className="UsernameModal">
+
+    return <GenericModal visible={showUsernameModal} exitCallback={exit}>
+        <div className="UsernameModal"  >
             <h2>Change username</h2>
-            <div className="exit" onClick={exit}>
-                <CrossSVG />
-            </div>
+
             <div className={"input " + (focused ? 'focused' : '')}>
                 <div className="label">
                     <div className="username">Display name</div>
@@ -67,7 +76,7 @@ const TopBar: React.FC<ITopBarProps> = ({ visible }) => {
                 </div>
                 <input
                     ref={usernameInputRef}
-                    onKeyUp={handleSetUsername}
+                    onKeyDown={handleKeyDown}
                     type="text"
                 />
             </div>
@@ -89,9 +98,8 @@ const TopBar: React.FC<ITopBarProps> = ({ visible }) => {
                 <button className='customButton'>Submit</button>
             </div>
 
-        </div >;
-    </Modal>
-
+        </div >
+    </GenericModal>
 };
 
 export default TopBar;

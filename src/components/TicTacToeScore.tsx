@@ -1,7 +1,7 @@
 import './TicTacToeScore.scss'
-import CircleSVG from '@/components/icons/CircleSVG';
-import CrossSVG from '@/components/icons/CrossSVG';
-import Scales from '@/components/icons/ScalesSVG';
+import CircleSVG from '@/util/svg/components/CircleSVG';
+import CrossSVG from '@/util/svg/components/CrossSVG';
+import Scales from '@/util/svg/components/ScalesSVG';
 
 interface IInGameScoreProps {
     score: {

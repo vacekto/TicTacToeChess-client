@@ -4,32 +4,38 @@ import { useContext } from 'react'
 import Menu from './pages/Menu/Menu';
 import TicTacToe from './pages/TicTacToe/TicTacToe';
 import UTicTacToe from './pages/UTicTacToe/UTicTacToe';
-import { useEffect, useRef, useState } from 'react';
-import { context } from './util/globalContext/ContextProvider';
+import { useEffect } from 'react';
+import { context } from './context/GlobalStateProvider';
 import Chess from './pages/Chess/Chess';
-import UsernameModal from './components/UsernameModal'
-import { registerDragToScroll, subscribeToSocketEvents } from './util/functions'
+import UsernameModal from './components/modals/UsernameModal'
+import {
+  registerDragToScroll,
+  subscribeToSocketEvents,
+  trackActiveGenericSelect,
+} from './util/functions'
 import { socketProxy } from '@/util/socketSingleton'
-
-
+import InvitationNotificationss from './components/InvitationNotifications';
 
 function App() {
-  const appElement = useRef<HTMLDivElement>(null);
   const navigate = useNavigate()
   const {
     theme,
-    showUsernameModal,
     updateGlobalState,
     gameName,
+    handleNewInvite,
   } = useContext(context)
 
 
   useEffect(() => {
-    registerDragToScroll(appElement.current!)
-    subscribeToSocketEvents(updateGlobalState, socketProxy)
+    registerDragToScroll()
+    subscribeToSocketEvents(socketProxy, updateGlobalState, handleNewInvite)
     socketProxy.on('disconnect', () => {
       navigate('/')
     })
+
+    socketProxy.emit('fetch_online_users')
+    socketProxy.emit('fetch_game_invites')
+
 
     return () => {
       socketProxy.removeAllListeners()
@@ -41,14 +47,16 @@ function App() {
     navigate(`/${gameName}`)
   }, [gameName])
 
+
   const test = () => {
-    socketProxy.emit('test')
+
   }
 
   return (
-    <div className="App" ref={appElement} id={theme}>
+    <div className="App" id={theme}>
       <button className='customButton' onClick={test}>test</button>
-      <UsernameModal visible={showUsernameModal} />
+      <InvitationNotificationss />
+      <UsernameModal />
       <Routes>
         <Route index element={<Menu />} />
         <Route path='/ticTacToe' element={<TicTacToe />} />

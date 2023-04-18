@@ -1,6 +1,6 @@
 import './InGameUsername.scss'
 import { useContext } from 'react'
-import { context } from '@/util/globalContext/ContextProvider'
+import { context } from '@/context/GlobalStateProvider'
 
 interface IInGameUsernameProps {
     username: string

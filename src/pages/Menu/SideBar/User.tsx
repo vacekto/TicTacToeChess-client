@@ -1,16 +1,25 @@
 import './User.scss'
-import { socketProxy } from '@/util/socketSingleton';
+import InviteToGameModal from '@/components/modals/InviteToGameModal';
+import { useState } from 'react';
+
 interface IUserProps {
     username: string
 }
 
 const User: React.FC<IUserProps> = ({ username }) => {
+    const [showModal, setShowModal] = useState(false)
+
     const handleInvite = () => {
-        socketProxy.emit('invite_player', username, 'chess')
+        setShowModal(true)
+    }
+
+    const exitModal = () => {
+        setShowModal(false)
     }
 
     return (
         <div className='User'>
+            <InviteToGameModal visible={showModal} exitCallback={exitModal} />
             <div className="username">
                 {username}
             </div>

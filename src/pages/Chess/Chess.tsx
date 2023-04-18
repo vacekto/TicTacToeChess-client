@@ -4,9 +4,9 @@ import useGame from '@/util/useGame'
 import { ChessGame, IChessMove, IChessState, TChessPiece, TGameMode } from 'shared';
 import InGameOptions from '@/components/InGameOptions';
 import InGameUsername from '@/components/InGameUsername';
-import { context } from '@/util/globalContext/ContextProvider'
+import { context } from '@/context/GlobalStateProvider'
 import ChessHistory from './ChessHistory';
-import SVG from './icons/ChessPiece'
+import SVG from '../../util/svg/components/ChessPieces'
 import reducer from './reducer'
 import { socketProxy } from '@/util/socketSingleton';
 import { v4 as uuidv4 } from 'uuid';

@@ -18,10 +18,18 @@ const GameInvite: React.FC<IGameInviteProps> = ({ invite }) => {
 
     return (
         <div className='GameInvite'>
-            {'sernder: ' + invite.sender}
-            {'game: ' + invite.game}
-            <button onClick={handleAccept}>accept</button>
-            <button onClick={handleDecline}>ignore</button>
+            <div className="info">
+                <div>
+                    {'Opponent: ' + invite.sender}
+                </div>
+                <div>
+                    {'Game: ' + invite.game}
+                </div>
+            </div>
+            <div className="action">
+                <button className='customButton' onClick={handleAccept}>accept</button>
+                <button className='customButton' onClick={handleDecline}>ignore</button>
+            </div>
         </div>
     );
 }

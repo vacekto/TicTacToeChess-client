@@ -1,23 +1,24 @@
-import { TGameSide } from 'shared'
-import { IGlobalState } from './globalContext/reducer'
+import { IGameInvite, TGameSide } from 'shared'
+import { IGlobalState } from '../context/globalReducer'
 import { TClientSocket } from './socketSingleton'
 
-interface myApp extends HTMLElement {
-    dragToScrollRegistered?: boolean
-}
-
-type TInitUsernameFromStorage = (
+type TRegisterGenericSelectTracker = (
     updateGlobalState: (stateUpdate: Partial<IGlobalState>,) => void,
-    socket: TClientSocket
 ) => void
 
-type TSubscribeToSocketEvents = TInitUsernameFromStorage
+type TSubscribeToSocketEvents = (
+    socket: TClientSocket,
+    updateGlobalState: (stateUpdate: Partial<IGlobalState>,) => void,
+    handleNewInvite: (newInvite: IGameInvite) => void
+) => void
 
-export const registerDragToScroll = (app: myApp) => {
-    if (app.dragToScrollRegistered) return
+
+export const registerDragToScroll = () => {
+    const app = document.getElementsByClassName('App')[0] as HTMLElement
+    if (app.dataset.dragToScroll === 'actives') return
     let pos = { top: 0, left: 0, x: 0, y: 0 };
     app.addEventListener('mousedown', mouseDownHandler)
-    app.dragToScrollRegistered = true
+    app.setAttribute('data-dragToScroll', 'active')
 
     function mouseDownHandler(event: any) {
         pos = {
@@ -47,7 +48,8 @@ export const registerDragToScroll = (app: myApp) => {
 
 
 
-export const subscribeToSocketEvents: TSubscribeToSocketEvents = (updateGlobalState, socket) => {
+
+export const subscribeToSocketEvents: TSubscribeToSocketEvents = (socket, updateGlobalState, handleNewInvite) => {
     socket.on('username_accepted', (username) => {
         const stateUpdate: Partial<IGlobalState> = {}
         stateUpdate.showUsernameModal = false
@@ -84,8 +86,44 @@ export const subscribeToSocketEvents: TSubscribeToSocketEvents = (updateGlobalSt
         stateUpdate.showUsernameModal = true
         stateUpdate.username = ''
         stateUpdate.usernameErrorMsg = err.message
-
         updateGlobalState(stateUpdate)
+    })
+
+    socket.on('online_users_update', users => {
+        updateGlobalState({ usersOnline: users })
+    })
+
+    socket.on('game_invites_update', invites => {
+        updateGlobalState({ gameInvites: invites })
+    })
+    socket.on('invite_declined', invite => {
+        console.log('invite declined: ' + invite)
+    })
+    socket.on('game_invite', handleNewInvite)
+
+    socket.on('invite_expired', () => {
+        console.log('invite expired')
+    })
+}
+
+
+export const trackActiveGenericSelect: TRegisterGenericSelectTracker = (updateGlobalState) => {
+    const app = document.getElementsByClassName('App')[0] as HTMLElement
+    if (app.dataset.genericSelectTracker === 'active') return
+    app.dataset.genericSelectTracker = 'active'
+    app.addEventListener('click', (e) => {
+        if (!(e.target instanceof Element)) return
+        let parent = e.target.parentElement
+        while (parent && !(parent instanceof Document)) {
+            if (parent.dataset.componentName === 'generic-select') {
+                return
+            }
+            parent = parent.parentElement
+        }
+        updateGlobalState({
+            activeGenericSelectId: ''
+        })
+
     })
 }
 
@@ -101,3 +139,4 @@ export const handleMenuResize = (element: HTMLDivElement) => {
 
     observer.observe(element)
 }
+

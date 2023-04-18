@@ -1,17 +1,14 @@
 import reducer, {
     IGlobalState,
-} from './reducer'
+} from './globalReducer'
 import {
     createContext,
     ReactNode,
     useReducer,
 } from "react";
+import { IGameInvite } from 'shared';
 
 
-interface IContext extends IGlobalState {
-    updateGlobalState: (stateUpdate: Partial<IGlobalState>) => void
-    switchLightTheme: () => void
-}
 
 const savedUsername = localStorage.getItem('username')
 
@@ -25,8 +22,17 @@ const defaultGlobalState: IGlobalState = {
     usernameErrorMsg: '',
     gameName: '',
     gameMode: '',
+    usersOnline: [],
+    gameInvites: [],
+    inviteNotifications: [],
+    activeGenericSelectId: '',
 }
 
+interface IContext extends IGlobalState {
+    updateGlobalState: (stateUpdate: Partial<IGlobalState>) => void
+    switchLightTheme: () => void
+    handleNewInvite: (newInvite: IGameInvite) => void
+}
 
 export const context = createContext<IContext>(defaultGlobalState as IContext);
 
@@ -52,10 +58,37 @@ const ContextProvider: React.FC<IContextProviderProps> = ({ children }) => {
     }
 
 
+
+    const handleNewInvite = (newInvite: IGameInvite) => {
+
+        setTimeout(() => {
+            dispatch({
+                type: 'REMOVE_NOTIFICATION',
+                payload: { inviteId: newInvite.id }
+            })
+        }, 5000)
+
+        setTimeout(() => {
+            dispatch({
+                type: 'REMOVE_INVITATION',
+                payload: { inviteId: newInvite.id }
+            })
+        }, 90000)
+
+        dispatch({
+            type: 'NEW_GAME_INVITE',
+            payload: { invite: newInvite }
+        })
+
+    }
+
+
+
     return <context.Provider value={{
         ...globalState,
         switchLightTheme,
         updateGlobalState,
+        handleNewInvite,
     }}>
         {children}
     </context.Provider >;

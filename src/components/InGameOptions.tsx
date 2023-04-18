@@ -1,9 +1,9 @@
 import './InGameOptions.scss'
-import Home from '@/components/icons/HomeSVG';
-import Repeat from '@/components/icons/RepeatSVG';
-import LightMode from '@/components/icons/LightModeSVG';
+import Home from '@/util/svg/components/HomeSVG';
+import Repeat from '@/util/svg/components/RepeatSVG';
+import LightMode from '@/util/svg/components/LightModeSVG';
 import { useContext } from 'react';
-import { context } from '@/util/globalContext/ContextProvider';
+import { context } from '@/context/GlobalStateProvider';
 
 interface IInGameOptionsProps {
   resetCb: () => void,
