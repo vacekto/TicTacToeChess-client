@@ -8,7 +8,7 @@ import GenericModal from './GenericModal';
 interface ITopBarProps {
 }
 
-const TopBar: React.FC<ITopBarProps> = () => {
+const UsernameModal: React.FC<ITopBarProps> = () => {
     const usernameInputRef = useRef<HTMLInputElement>({} as HTMLInputElement)
     const [rememberUsername, setRememberUsername] = useState<boolean>(false)
     const [focused, setFocused] = useState<Boolean>(false)
@@ -18,16 +18,14 @@ const TopBar: React.FC<ITopBarProps> = () => {
     } = useContext(context)
 
 
-    const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-        if (e.key !== 'Enter') return
-
+    const handleSubmit = () => {
         const username = usernameInputRef.current.value.trim()
         if (
             !username ||
             username.length > 15 ||
-            username.includes('  ')
+            username.includes(' ')
         ) {
-            console.log('chyba')
+            console.error('spatne jmeno')
             return
         }
         if (socketProxy.connected)
@@ -35,8 +33,11 @@ const TopBar: React.FC<ITopBarProps> = () => {
         else socketProxy.connect(username)
         if (rememberUsername)
             localStorage.setItem('username', username)
-        return
+    }
 
+    const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+        if (e.key !== 'Enter') return
+        handleSubmit()
     }
 
     const exit = () => {
@@ -64,7 +65,7 @@ const TopBar: React.FC<ITopBarProps> = () => {
     }, [showUsernameModal])
 
 
-    return <GenericModal visible={showUsernameModal} exitCallback={exit}>
+    return <GenericModal visible={showUsernameModal} exitModal={exit}>
         <div className="UsernameModal"  >
             <h2>Change username</h2>
 
@@ -95,11 +96,11 @@ const TopBar: React.FC<ITopBarProps> = () => {
 
             </div>
             <div className="buttonContainer">
-                <button className='customButton'>Submit</button>
+                <button className='customButton' onClick={handleSubmit}>Submit</button>
             </div>
 
         </div >
     </GenericModal>
 };
 
-export default TopBar;
+export default UsernameModal;

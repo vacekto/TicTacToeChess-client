@@ -2,6 +2,7 @@
 
 $option-width: 200px;
 $option-height: 35px;
+$options-height: 200px;
 
 .GenericSelect {
     position: relative;
@@ -62,49 +63,40 @@ $option-height: 35px;
 
 
     .options {
-        border: 1px solid rgb(206, 206, 206);
+        opacity: 0;
         margin-top: 5px;
         position: absolute;
         max-height: 0px;
-        transition: all .13s;
-        opacity: 0;
+        transition: all .25s;
         box-sizing: border-box;
         border-radius: 5px;
         width: 100%;
         overflow: hidden;
+        border: 1px solid rgb(206, 206, 206);
+
     }
 
-
-
-
     &.extended {
+
         .arrowhead {
             transform: rotate(180deg);
         }
 
         .options {
-            max-height: 200px;
+            max-height: $options-height;
             overflow: auto;
             opacity: 1;
             z-index: 2;
+            animation: hide-scroll 1.2s backwards;
         }
+
     }
 
-    ::-webkit-scrollbar {
-        position: absolute;
-        width: 8px;
-        border-radius: 8px;
-    }
+    @keyframes hide-scroll {
 
-    ::-webkit-scrollbar-thumb {
-        background-color: #b4b4b4;
-        border-radius: 8px;
-        margin: 2px;
-        width: 2px;
-        cursor: pointer;
-
-        &:hover {
-            background-color: #888888;
+        from,
+        to {
+            overflow: hidden;
         }
     }
 

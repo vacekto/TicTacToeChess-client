@@ -4,7 +4,10 @@ import {
     TGameMode,
     IGameInvite
 } from "shared";
-import { socketProxy } from '@/util/socketSingleton';
+
+export interface IGameInviteWithTimestamp extends IGameInvite {
+    timestamp: number
+}
 
 
 export interface IGlobalState {
@@ -18,8 +21,8 @@ export interface IGlobalState {
     gameMode: TGameMode | ''
     usernameErrorMsg: string,
     usersOnline: string[],
-    gameInvites: IGameInvite[],
-    inviteNotifications: IGameInvite[],
+    gameInvites: IGameInviteWithTimestamp[],
+    inviteNotifications: IGameInviteWithTimestamp[],
     activeGenericSelectId: string,
 };
 
@@ -27,88 +30,88 @@ export type TGlobalStateAction =
     {
         type: 'STATE_UPDATE';
         payload: { stateUpdate: Partial<IGlobalState> }
-    }
+    } |
 
-    | {
-        type: 'NEW_GAME_INVITE';
-        payload: { invite: IGameInvite }
-    }
+    {
+        type: 'NEW_INVITATION';
+        payload: { invite: IGameInviteWithTimestamp }
+    } |
 
-    | {
-        type: 'REMOVE_NOTIFICATION';
-        payload: { inviteId: string }
-    }
-    | {
+    {
         type: 'REMOVE_INVITATION';
-        payload: { inviteId: string }
+        payload: { invite: IGameInviteWithTimestamp }
+    } |
+    {
+        type: 'REMOVE_NOTIFICATION';
+        payload: { invite: IGameInviteWithTimestamp }
     }
-    | {
-        type: 'PREVIOUS_SELECT_UPDATE';
-    }
+
 
 
 const reducer = (prevState: IGlobalState, action: TGlobalStateAction) => {
-    let notifications: IGameInvite[]
-    let gameInvites: IGameInvite[]
-    let filtered: IGameInvite[]
+    let update = { ...prevState } as IGlobalState
+    let index: number
+    let invite: IGameInviteWithTimestamp
     switch (action.type) {
         case 'STATE_UPDATE':
 
-            if (
-                prevState.gameMode === 'multiplayer' &&
-                !action.payload.stateUpdate.gameMode
-            )
-                socketProxy.emit('leave_game')
-
-            return {
-                ...prevState,
+            update = {
+                ...update,
                 ...action.payload.stateUpdate
             }
 
-        case 'NEW_GAME_INVITE':
-            gameInvites = [...prevState.gameInvites]
-            notifications = [...prevState.inviteNotifications]
-            const newInvite = action.payload.invite
-            const index = prevState.gameInvites.findIndex(inv => {
-                return inv.id === newInvite.id
-            })
-            if (index === -1) {
-                gameInvites.push(newInvite)
-                notifications.push(newInvite)
-            }
-            return {
-                ...prevState,
-                gameInvites,
-                notifications
-            }
+            return update
 
-        case 'REMOVE_NOTIFICATION':
-            notifications = [...prevState.inviteNotifications]
-            filtered = notifications.filter(invite => {
-                return invite.id !== action.payload.inviteId
+        case 'NEW_INVITATION':
+            invite = action.payload.invite
+            index = prevState.gameInvites.findIndex(inv => {
+                return (
+                    invite.game === inv.game &&
+                    invite.invitee === inv.invitee &&
+                    invite.sender === inv.sender
+                )
             })
-            return {
-                ...prevState,
-                inviteNotifications: filtered,
-            }
+
+            if (index !== -1) return update
+
+            update.gameInvites = [...prevState.gameInvites]
+            update.gameInvites.push(invite)
+            update.inviteNotifications = [...prevState.inviteNotifications]
+            update.inviteNotifications.push(invite)
+
+            return update
 
         case 'REMOVE_INVITATION':
-            const id = action.payload.inviteId
-            gameInvites = [...prevState.gameInvites]
-            filtered = gameInvites.filter(invite => {
-                return invite.id !== id
+            invite = action.payload.invite
+            update.gameInvites = [...prevState.gameInvites]
+            index = prevState.gameInvites.findIndex(inv => {
+                return (
+                    invite.game === inv.game &&
+                    invite.invitee === inv.invitee &&
+                    invite.sender === inv.sender
+                )
             })
-            return {
-                ...prevState,
-                gameInvites
-            }
 
-        case 'PREVIOUS_SELECT_UPDATE':
-            return {
-                ...prevState,
-                previousGenericSelectId: prevState.activeGenericSelectId,
-                activeGenericSelectId: ''
-            }
+            if (index !== -1) update.gameInvites.splice(index, 1)
+
+            return update
+
+        case 'REMOVE_NOTIFICATION':
+            invite = action.payload.invite
+            index = prevState.inviteNotifications.findIndex(inv => {
+                return (
+                    invite.game === inv.game &&
+                    invite.invitee === inv.invitee &&
+                    invite.sender === inv.sender
+                )
+            })
+            if (index === -1) return update
+
+            update.inviteNotifications = [...prevState.inviteNotifications]
+            update.inviteNotifications.splice(index, 1)
+
+            return update
+
         default:
             throw Error('Unknown reducer action');
     }

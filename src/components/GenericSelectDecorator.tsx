@@ -1,14 +1,14 @@
 import { useContext, useEffect } from 'react'
-import { IGenericSelectProps, IExtendState } from './GenericSelect/GenericSelect'
-import GenericSelect from './GenericSelect/GenericSelect'
+import { IGenericSelectProps, IExtendState } from './GenericSelect'
+import GenericSelect from './GenericSelect'
 import { context } from '@/context/GlobalStateProvider'
 import { trackActiveGenericSelect } from '@/util/functions'
 
-type TGenericSelectDecoratorProps = React.FC<
+type TGenericSelectDecorator = React.FC<
     Omit<IGenericSelectProps, 'activeGenericSelectId' | 'extendedCallback'>
 >
 
-const GenericSelectDecorator: TGenericSelectDecoratorProps = (props) => {
+const GenericSelectDecorator: TGenericSelectDecorator = (props) => {
     const { activeGenericSelectId, updateGlobalState } = useContext(context)
 
     const extendCallback = (componentState: IExtendState) => {

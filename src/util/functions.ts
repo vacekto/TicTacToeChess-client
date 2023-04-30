@@ -15,26 +15,26 @@ type TSubscribeToSocketEvents = (
 
 export const registerDragToScroll = () => {
     const app = document.getElementsByClassName('App')[0] as HTMLElement
-    if (app.dataset.dragToScroll === 'actives') return
+    if (app.dataset.dragToScroll === 'active') return
+    app.dataset.dragToScroll = 'active'
     let pos = { top: 0, left: 0, x: 0, y: 0 };
     app.addEventListener('mousedown', mouseDownHandler)
-    app.setAttribute('data-dragToScroll', 'active')
 
-    function mouseDownHandler(event: any) {
+    function mouseDownHandler(e: any) {
         pos = {
             left: app.scrollLeft,
             top: app.scrollTop,
-            x: event.clientX,
-            y: event.clientY,
+            x: e.clientX,
+            y: e.clientY,
         };
 
         document.addEventListener('mousemove', mouseMoveHandler);
         document.addEventListener('mouseup', mouseUpHandler);
     };
 
-    function mouseMoveHandler(event: any) {
-        const dx = event.clientX - pos.x;
-        const dy = event.clientY - pos.y;
+    function mouseMoveHandler(e: any) {
+        const dx = e.clientX - pos.x;
+        const dy = e.clientY - pos.y;
         app.scrollTop = pos.top - dy;
         app.scrollLeft = pos.left - dx;
     };
@@ -80,9 +80,7 @@ export const subscribeToSocketEvents: TSubscribeToSocketEvents = (socket, update
 
     socket.on('connect_error', (err) => {
         console.log(err.message)
-
         const stateUpdate: Partial<IGlobalState> = {}
-
         stateUpdate.showUsernameModal = true
         stateUpdate.username = ''
         stateUpdate.usernameErrorMsg = err.message
@@ -93,17 +91,7 @@ export const subscribeToSocketEvents: TSubscribeToSocketEvents = (socket, update
         updateGlobalState({ usersOnline: users })
     })
 
-    socket.on('game_invites_update', invites => {
-        updateGlobalState({ gameInvites: invites })
-    })
-    socket.on('invite_declined', invite => {
-        console.log('invite declined: ' + invite)
-    })
     socket.on('game_invite', handleNewInvite)
-
-    socket.on('invite_expired', () => {
-        console.log('invite expired')
-    })
 }
 
 
@@ -111,19 +99,19 @@ export const trackActiveGenericSelect: TRegisterGenericSelectTracker = (updateGl
     const app = document.getElementsByClassName('App')[0] as HTMLElement
     if (app.dataset.genericSelectTracker === 'active') return
     app.dataset.genericSelectTracker = 'active'
+
     app.addEventListener('click', (e) => {
         if (!(e.target instanceof Element)) return
         let parent = e.target.parentElement
+
         while (parent && !(parent instanceof Document)) {
-            if (parent.dataset.componentName === 'generic-select') {
-                return
-            }
+            if (parent.dataset.componentName === 'generic-select') return
             parent = parent.parentElement
         }
+
         updateGlobalState({
             activeGenericSelectId: ''
         })
-
     })
 }
 

@@ -1,16 +1,34 @@
 @import '@/util/CSS/constants.scss';
 
 .App {
+  width: 100%;
   height: 100vh;
   display: flex;
   flex-direction: column;
   margin: auto;
   position: relative;
   overflow: auto;
-  overscroll-behavior: contain;
-  overflow: hidden;
 }
 
+* {
+  ::-webkit-scrollbar {
+    position: absolute;
+    width: 8px;
+    border-radius: 8px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #b4b4b4;
+    border-radius: 8px;
+    margin: 2px;
+    width: 2px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #888888;
+    }
+  }
+}
 
 .App::before {
   content: "";

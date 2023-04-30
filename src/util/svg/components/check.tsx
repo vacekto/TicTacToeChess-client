@@ -1,8 +1,5 @@
-interface ICheckProps {
 
-}
-
-const Check: React.FC<ICheckProps> = () => {
+const Check: React.FC = () => {
 
     const centerX = 42
     const centerY = 75

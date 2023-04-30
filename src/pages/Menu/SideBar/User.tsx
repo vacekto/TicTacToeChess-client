@@ -19,7 +19,11 @@ const User: React.FC<IUserProps> = ({ username }) => {
 
     return (
         <div className='User'>
-            <InviteToGameModal visible={showModal} exitCallback={exitModal} />
+            <InviteToGameModal
+                visible={showModal}
+                exitModal={exitModal}
+                inviteeUsername={username}
+            />
             <div className="username">
                 {username}
             </div>

@@ -1,62 +1,59 @@
 @import '@/util/CSS/constants.scss';
 
-$width: 350px;
-$height: 80px;
+
 
 .InvitationNotifications {
+    position: fixed;
+    width: 350px;
+    max-height: 150px;
+    right: 20px;
+    top: 100px;
+    z-index: 5;
+    color: white;
+
+
     .notification {
-
-        position: fixed;
-        width: $width;
-        height: $height;
-        background-color: $light-green;
         border-radius: 10px;
-        color: white;
-        font-family: sans-serif;
-        font-size: large;
-        padding: 20px;
-        letter-spacing: 1px;
-        z-index: 1;
-        margin: 30px;
-        right: 0;
-        color: $dark-gray;
+        background-color: $light-green;
+        box-sizing: border-box;
+        padding: 10px 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+        margin-bottom: 10px;
 
-        .info {
-            width: 80%;
-
-            div {
-                display: inline;
-            }
+        .message {
+            flex: 1;
         }
 
-        .spacing {}
 
         .action {
-            margin-top: 20px;
-            width: 100%;
+            flex: 1;
             display: flex;
+            align-items: center;
             justify-content: space-around;
+            font-family: 'LuckiestGuy';
+            min-height: 50px;
 
-            div {
-                font-family: 'LuckiestGuy';
-                cursor: pointer;
+            .container {
+                height: 100%;
+                box-sizing: border-box;
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                position: relative;
-                width: max-content;
-                height: max-content;
+
+                width: 100%;
 
                 div {
-                    position: absolute;
-                }
+                    cursor: pointer;
+                    margin: auto;
 
-                div:hover {
-                    font-size: larger;
-
+                    &:hover {
+                        font-size: 20px;
+                    }
                 }
             }
         }
-
     }
 }

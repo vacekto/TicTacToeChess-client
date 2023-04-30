@@ -2,14 +2,13 @@
 
 
 .SideBar {
-  top: 0;
-  left: 0;
   min-width: 400px;
-  height: 100%;
   background-color: white;
   z-index: 8;
   font-family: sans-serif;
   letter-spacing: 1px;
+  height: 100%;
+  overflow: auto;
 
   .activeBarName {
     height: 80px;
@@ -22,6 +21,9 @@
     font-size: larger;
   }
 
+  .sideBarList {
+    overflow: auto;
+  }
 }
 
 @media only screen and (max-width: 600px) {

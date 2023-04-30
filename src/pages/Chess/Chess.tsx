@@ -1,15 +1,15 @@
 import './Chess.scss'
-import { useReducer, useContext, useEffect } from 'react';
-import useGame from '@/util/useGame'
-import { ChessGame, IChessMove, IChessState, TChessPiece, TGameMode } from 'shared';
+import { useReducer, useContext, useEffect, MouseEvent, useRef, useState } from 'react';
+import { ChessGame, IChessMove, IChessState, TChessPiece } from 'shared';
 import InGameOptions from '@/components/InGameOptions';
 import InGameUsername from '@/components/InGameUsername';
 import { context } from '@/context/GlobalStateProvider'
 import ChessHistory from './ChessHistory';
-import SVG from '../../util/svg/components/ChessPieces'
 import reducer from './reducer'
 import { socketProxy } from '@/util/socketSingleton';
 import { v4 as uuidv4 } from 'uuid';
+
+import ChessPiece from '@/util/svg/components/ChessPiece'
 
 const Chess: React.FC = () => {
     const {
@@ -19,7 +19,14 @@ const Chess: React.FC = () => {
         gameSide,
         updateGlobalState
     } = useContext(context)
-    const { gameInstance } = useGame('chess', gameMode as TGameMode) as { gameInstance: ChessGame }
+
+
+    const gameInstance = useRef(new ChessGame()).current
+
+    const movingPiece = useRef<SVGSVGElement | null>(null)
+    const dragStartPos = useRef<[number, number] | null>(null)
+    const [dragCurrentPos, setDragCurrentPos] = useState<[number, number] | null>(null)
+
     const [state, dispatch] = useReducer(reducer, {
         ...gameInstance.state,
         selected: null,
@@ -108,14 +115,12 @@ const Chess: React.FC = () => {
         gameInstance.fastBackward()
         const state = gameInstance.state
         dispatch({ type: 'STATE_UPDATE', payload: { state } })
-
     }
 
     const fastForwardCb = () => {
         gameInstance.fastForward()
         const state = gameInstance.state
         dispatch({ type: 'STATE_UPDATE', payload: { state } })
-
     }
 
 
@@ -137,7 +142,6 @@ const Chess: React.FC = () => {
     })
 
     useEffect(() => {
-
         socketProxy.on('game_state_update', (state, lastMove) => {
             gameInstance.move(lastMove as IChessMove)
             dispatch({ type: 'STATE_UPDATE', payload: { state: state as IChessState } })
@@ -157,35 +161,107 @@ const Chess: React.FC = () => {
             socketProxy.removeListener('game_state_update')
             socketProxy.removeListener('leave_game')
         }
+
     }, [])
 
 
+    const test = (X: number, Y: number) => () => {
+        console.log('hahaha')
+    }
+
+
+    const handleMouseMove = (X: number, Y: number) => (e: MouseEvent) => {
+        if (!movingPiece.current || !dragStartPos.current || !dragCurrentPos) return
+        const diffX = dragStartPos.current[0] - e.clientX
+        const diffY = e.clientY - dragStartPos.current[1]
+        movingPiece.current.style.right = diffX + 'px'
+        movingPiece.current.style.top = diffY + 'px'
+        movingPiece.current.style.zIndex = '1'
+        if (X === dragCurrentPos[0] && Y === dragCurrentPos[1]) return
+        setDragCurrentPos([X, Y])
+    }
+
+    const handleMouseDown = (X: number, Y: number) => (e: MouseEvent) => {
+        const square = document.getElementById(`square${X}${Y}`)
+        const svg = square?.children[0] as SVGSVGElement | undefined
+        if (!svg) return
+        setDragCurrentPos([X, Y])
+        movingPiece.current = svg
+        dragStartPos.current = [e.clientX, e.clientY]
+    }
+
+    const handleMouseUp = () => {
+        if (movingPiece.current && dragStartPos.current) {
+            movingPiece.current.style.right = '0'
+            movingPiece.current.style.top = '0'
+            movingPiece.current.style.zIndex = '0'
+        }
+        movingPiece.current = null
+        dragStartPos.current = null
+        setDragCurrentPos(null)
+    }
+
+
+
+    const setChessPieceStyle = (X: number, Y: number) => {
+        const style: React.CSSProperties = {}
+        if (
+            dragCurrentPos &&
+            dragCurrentPos[0] === X &&
+            dragCurrentPos[1] === Y &&
+            state.board[X][Y] === 'ee'
+        )
+
+
+            style.opacity = '0'
+        return style
+    }
 
     return <div className='Chess'>
         <InGameUsername username={username} opponentUsername={opponentUsername} />
-
         <div className="boardContainer">
 
             <div className="piecesTakenWhite">
-                {state.figuresTaken.w.sort(sortFn).map(piece => {
+                {state.figuresTaken.w.sort(sortFn).map((piece, index) => {
                     return <div
                         className='pieceTaken'
-                        key={uuidv4()}>
-                        {SVG[piece]}
+                        key={index}
+                    >
+                        <img src='test.svg' alt="" />
                     </div>
                 })}
             </div>
 
             <div className="board">
+
                 {state.board.map((row, X) => {
                     return <div className='row' key={X}>
+
                         {row.map((piece, Y) => {
+                            if (
+                                piece === 'ee' &&
+                                dragCurrentPos &&
+                                dragCurrentPos[0] === X &&
+                                dragCurrentPos[1] === Y
+                            ) {
+
+                            }
+
+
                             return <div
-                                className={`square ${setSquareStyleClass(X, Y)}`}
                                 key={Y}
+                                className={`square ${setSquareStyleClass(X, Y)}`}
+                                id={`square${X}${Y}`}
                                 onClick={handleSquareClick(X, Y)}
+                                onMouseMove={handleMouseMove(X, Y)}
+                                // onClick={test(X, Y)}
+                                onMouseDown={handleMouseDown(X, Y)}
+                                onMouseUp={handleMouseUp}
                             >
-                                {SVG[piece]}
+                                <ChessPiece
+                                    piece={piece}
+                                    style={setChessPieceStyle(X, Y)}
+                                />
                             </div>
                         })}
                     </div>
@@ -196,13 +272,10 @@ const Chess: React.FC = () => {
                     return <div
                         className='pieceTaken'
                         key={uuidv4()}>
-                        {SVG[piece]}
                     </div>
                 })}
             </div>
         </div>
-
-
         <InGameOptions resetCb={resetCb} />
         {state.winner ?
             <ChessHistory

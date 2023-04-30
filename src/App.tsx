@@ -11,7 +11,6 @@ import UsernameModal from './components/modals/UsernameModal'
 import {
   registerDragToScroll,
   subscribeToSocketEvents,
-  trackActiveGenericSelect,
 } from './util/functions'
 import { socketProxy } from '@/util/socketSingleton'
 import InvitationNotificationss from './components/InvitationNotifications';
@@ -34,8 +33,6 @@ function App() {
     })
 
     socketProxy.emit('fetch_online_users')
-    socketProxy.emit('fetch_game_invites')
-
 
     return () => {
       socketProxy.removeAllListeners()
@@ -49,12 +46,12 @@ function App() {
 
 
   const test = () => {
-
+    console.log('hahaha')
   }
 
   return (
     <div className="App" id={theme}>
-      <button className='customButton' onClick={test}>test</button>
+      {/* <div className='customButton' onClick={test} draggable onDragStart={() => console.log('cosikdesi')}>test</div> */}
       <InvitationNotificationss />
       <UsernameModal />
       <Routes>

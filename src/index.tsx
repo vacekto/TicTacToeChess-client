@@ -4,6 +4,7 @@ import './index.scss';
 import App from './App';
 import ContextProvider from './context/GlobalStateProvider';
 import { BrowserRouter } from 'react-router-dom';
+import Test from './test/Test';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -17,4 +18,5 @@ root.render(
       </BrowserRouter>
     </ContextProvider>
   </React.StrictMode>
+  // <Test />
 );

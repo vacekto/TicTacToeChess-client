@@ -23,7 +23,7 @@ const socketSingleton = function () {
     }
 }()
 
-export const createSocketProxy = (socket: TClientSocket) => {
+const createSocketProxy = (socket: TClientSocket) => {
 
     const onProxy = new Proxy(socket.on, {
         apply(target, thisArg, args) {

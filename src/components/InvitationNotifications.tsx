@@ -1,26 +1,53 @@
 import './InvitationNotifications.scss'
-import { useLocation } from 'react-router-dom';
-import { useContext, useRef } from 'react'
+import { useContext } from 'react'
 import { context } from '@/context/GlobalStateProvider';
+import { IGameInviteWithTimestamp } from '@/context/globalReducer';
+import { socketProxy } from '@/util/socketSingleton';
+import { IGameInvite } from 'shared';
 
 interface IInvitationNotificationsProps {
 }
 
 const InvitationNotifications: React.FC<IInvitationNotificationsProps> = () => {
-    const location = useLocation();
-    const { inviteNotifications } = useContext(context)
+    const {
+        inviteNotifications,
+        removeInvite
+    } = useContext(context)
 
-    const invitationStyle: React.CSSProperties = location.pathname === '/' ?
-        { top: '80px' } : {}
+    const handleAccept = (invite: IGameInviteWithTimestamp) => () => {
+        const inv: IGameInvite = {
+            game: invite.game,
+            invitee: invite.invitee,
+            sender: invite.sender
+        }
+
+        socketProxy.emit('accept_invite', inv)
+
+        removeInvite(invite)
+    }
+
+    const handleDecline = (invite: IGameInviteWithTimestamp) => () => {
+        removeInvite(invite)
+    }
 
 
-    return <div style={invitationStyle}>
-        {inviteNotifications.map(invite => {
-            return <div className="InvitationNotifications">
-                <div className="info">User {invite.sender} invtited you to the game of <div>{invite.game}</div> !</div>
+    return <div className='InvitationNotifications'>
+        {inviteNotifications.map((invite, index) => {
+            return <div className='notification' key={index}>
+                <div className="message">
+                    {`${invite.sender} has invited you the the game of ${invite.game}`}
+                </div>
                 <div className="action">
-                    <div><div>accept</div></div>
-                    <div><div>decline</div></div>
+                    <div className="container">
+                        <div onClick={handleAccept(invite)}>
+                            Accept
+                        </div>
+                    </div>
+                    <div className="container">
+                        <div onClick={handleDecline(invite)}>
+                            decline
+                        </div>
+                    </div>
                 </div>
 
             </div>

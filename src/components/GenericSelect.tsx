@@ -27,7 +27,7 @@ export interface IGenericSelectProps {
     activeGenericSelectId?: string,
     defaultDescription?: string,
     children?: ReactNode,
-    selectIndex?: () => void
+    eventTarget?: EventTarget
 }
 
 const GenericSelect: React.FC<IGenericSelectProps> = ({
@@ -37,7 +37,7 @@ const GenericSelect: React.FC<IGenericSelectProps> = ({
     activeGenericSelectId,
     defaultDescription,
     children,
-    selectIndex
+    eventTarget
 }) => {
 
     const [renderedOptions, setRenderedOptions] = useState<ReactNode[]>([])
@@ -66,24 +66,41 @@ const GenericSelect: React.FC<IGenericSelectProps> = ({
         })
     }, [indexOfSelected])
 
+
     useEffect(() => {
         if (activeGenericSelectId === componentRef.current.dataset.componentId) return
         setExtended(false)
     }, [activeGenericSelectId])
+
 
     useEffect(() => {
         if (children) return
         setRenderedOptions(options)
     }, [options])
 
+
     useEffect(() => {
         if (children instanceof Array) setRenderedOptions(children)
         setRenderedOptions([children])
     }, [children])
 
+
     useEffect(() => {
         componentRef.current.dataset.componentId = uuidv4();
         componentRef.current.dataset.componentName = 'generic-select'
+
+        if (!eventTarget) return
+        eventTarget.addEventListener('selectSideIndex', ((event: CustomEvent) => {
+            const newIndex = event?.detail?.index
+            if (
+                typeof newIndex === 'number' &&
+                newIndex > -2 &&
+                newIndex < renderedOptions.length
+            )
+                setIndexOfSelected(newIndex)
+        }) as EventListener)
+
+
     }, [])
 
 

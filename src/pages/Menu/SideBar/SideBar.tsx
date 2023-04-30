@@ -1,6 +1,6 @@
 import './SideBar.scss'
 import User from './User'
-import { CSSProperties, useContext, useRef } from 'react'
+import { CSSProperties, useContext } from 'react'
 import { context } from '@/context/GlobalStateProvider'
 import { v4 as uuidv4 } from 'uuid';
 import GameInvite from './GameInvite'
@@ -21,22 +21,25 @@ const SideBar: React.FC<ISideBarProps> = ({ activeSideBar }) => {
             <div className="activeBarName">
                 {activeSideBar === 'usersOnline' ? 'Users online' : 'Game invitations'}
             </div>
-            {activeSideBar === 'gameInvites' ?
-                gameInvites.map(invite => {
-                    return <GameInvite
-                        invite={invite}
-                        key={uuidv4()}
-                    />
-                })
-                :
-                usersOnline.map((user, userIndex) => {
-                    return username === user ? null :
-                        <User
-                            key={userIndex}
-                            username={user}
+            <div className="sideBarList">
+
+                {activeSideBar === 'gameInvites' ?
+                    gameInvites.map((invite, inviteIndex) => {
+                        return <GameInvite
+                            invite={invite}
+                            key={inviteIndex}
                         />
-                })
-            }
+                    })
+                    :
+                    usersOnline.map((user, userIndex) => {
+                        return username === user ? null :
+                            <User
+                                key={userIndex}
+                                username={user}
+                            />
+                    })
+                }
+            </div>
         </div>
     );
 }
