@@ -27,7 +27,8 @@ const Options: React.FC<IOptionsProps> = ({ activeSideBar, setActiveSideBar }) =
     const handleHotseat = () => {
         updateGlobalState({
             gameName: selectedGame,
-            gameMode: 'hotseat'
+            gameMode: 'hotseat',
+            gameSide: selectedGame === 'chess' ? 'w' : 'X'
         })
     }
 

@@ -8,37 +8,52 @@ import ChessHistory from './ChessHistory';
 import reducer from './reducer'
 import { socketProxy } from '@/util/socketSingleton';
 import { v4 as uuidv4 } from 'uuid';
+import useChessInstance from './useChessInstance'
 
 import ChessPiece from '@/util/svg/components/ChessPiece'
+
+interface IDragData {
+    elementRef: SVGSVGElement
+    mouseStart: [number, number]
+    currentSquare: [number, number]
+}
+
 
 const Chess: React.FC = () => {
     const {
         username,
         opponentUsername,
-        gameMode,
-        gameSide,
         updateGlobalState
     } = useContext(context)
-
-
-    const gameInstance = useRef(new ChessGame()).current
-
-    const movingPiece = useRef<SVGSVGElement | null>(null)
-    const dragStartPos = useRef<[number, number] | null>(null)
-    const [dragCurrentPos, setDragCurrentPos] = useState<[number, number] | null>(null)
-
+    const [flipped, setFlipped] = useState<boolean>(false)
+    const gameInstance = useChessInstance()
+    const [dragData, setDragData] = useState<IDragData | null>(null)
     const [state, dispatch] = useReducer(reducer, {
         ...gameInstance.state,
         selected: null,
         potentialMoves: []
     })
 
+    const isInPotentialMoves = (X: number, Y: number) => {
+        let outcome = false
+
+        for (const [A, B] of state.potentialMoves) {
+            if (X === A && Y === B) {
+                outcome = true
+                break
+            }
+        }
+
+        return outcome
+    }
+
     const setSquareStyleClass = (X: number, Y: number) => {
         let className = ''
         const SE = state.selected
-        if (X === 0) className += 'noBorderTop '
-        if (Y === 0) className += 'noBorderLeft '
-        if ((X + Y) % 2 === 0) className += 'even '
+
+        const i = flipped ? 1 : 0
+
+        if ((X + Y) % 2 === i) className += 'even '
         if (SE && SE[0] === X && SE[1] === Y) className += 'active '
         state.potentialMoves.forEach(([A, B]) => {
             if (A === X && B === Y) className += 'potentialMove '
@@ -46,52 +61,8 @@ const Chess: React.FC = () => {
         return className
     }
 
-    const handleSquareClick = (X: number, Y: number) => () => {
-        const SE = state.selected
-        for (let [A, B] of state.potentialMoves) {
-            if (
-                gameMode === 'multiplayer' &&
-                state.activePlayer !== gameSide
-            )
-                break
-            if (A === X && B === Y) {
-                const move = {
-                    from: {
-                        X: SE![0],
-                        Y: SE![1]
-                    },
-                    to: { X, Y }
-                }
-                gameInstance.move(move)
-                if (gameMode === 'multiplayer')
-                    socketProxy.emit('game_move', move)
-                const stateUpdate = gameInstance.state
-                dispatch({
-                    type: 'STATE_UPDATE',
-                    payload: { state: stateUpdate }
-                })
-                return
-            }
-        }
-
-        if (SE && SE[0] === X && SE[1] === Y) {
-            dispatch({ type: 'DESELECT' })
-            return
-        }
-
-        let moves = gameInstance.getLegalMoves([X, Y])
-
-        dispatch({
-            type: 'SELECT',
-            payload: {
-                coord: [X, Y],
-                potentialMoves: moves
-            },
-        })
-    }
-
     const resetCb = () => {
-        gameInstance.resetState()
+        gameInstance.resetGame()
         const state = gameInstance.state as IChessState
         dispatch({
             type: 'RESET_STATE',
@@ -124,7 +95,7 @@ const Chess: React.FC = () => {
     }
 
 
-    const sortFn = ((figureA: TChessPiece, figureB: TChessPiece) => {
+    const sortPieces = ((pieceA: TChessPiece, pieceB: TChessPiece) => {
         const sortValues = {
             p: 1,
             n: 2,
@@ -133,13 +104,171 @@ const Chess: React.FC = () => {
             q: 5
         }
 
-        const a = figureA[1] as keyof typeof sortValues
-        const b = figureB[1] as keyof typeof sortValues
+        const a = pieceA[1] as keyof typeof sortValues
+        const b = pieceB[1] as keyof typeof sortValues
 
         if (sortValues[a] < sortValues[b]) return 1
         if (sortValues[a] > sortValues[b]) return -1
         return 0
     })
+
+    const handleMouseMove = (X: number, Y: number) => (e: MouseEvent) => {
+        if (!dragData) return
+
+
+        const mouseDiffX = e.clientY - dragData.mouseStart[1]
+        const mouseDiffY = e.clientX - dragData.mouseStart[0]
+        dragData.elementRef.style.top = mouseDiffX + 'px'
+        dragData.elementRef.style.left = mouseDiffY + 'px'
+        dragData.elementRef.style.zIndex = '1'
+
+        const isOutOfBounds = (X: number, Y: number) => {
+            return (
+                0 >= X &&
+                X >= 7 &&
+                0 >= Y &&
+                Y >= 7
+            )
+        }
+
+        const i = flipped ? -1 : 1
+        const squareDiffX = Math.floor((mouseDiffX + i * 25) / (i * 50))
+        const squareDiffY = Math.floor((mouseDiffY + 25) / 50)
+
+        const newSquareX = X + squareDiffX
+        const newSquareY = Y + squareDiffY
+
+        if (isOutOfBounds(newSquareX, newSquareY)) {
+            dragData.elementRef.style.left = '0'
+            dragData.elementRef.style.top = '0'
+            dragData.elementRef.style.zIndex = '0'
+            setDragData(null)
+            return
+        }
+
+        if (
+            newSquareX === dragData.currentSquare[0] &&
+            newSquareY === dragData.currentSquare[1]
+        )
+            return
+
+        setDragData(prevState => {
+            const update = { ...prevState! }
+            update.currentSquare = [newSquareX, newSquareY]
+            return update
+        })
+    }
+
+    const handleMouseDown = (X: number, Y: number) => (e: MouseEvent) => {
+        const squareElement = document.getElementById(`square${X}${Y}`)
+        const svgElement = squareElement?.children[0] as SVGSVGElement | undefined
+        const boardPiece = state.board[X][Y]
+        const clickedSide = boardPiece[0]
+
+        if (
+            isInPotentialMoves(X, Y) &&
+            state.selected
+        ) {
+
+            const [A, B] = state.selected
+            const from = [A, B]
+            const to = [X, Y]
+            const move = { from, to } as IChessMove
+
+            gameInstance.move(move)
+
+            const stateUpdate = gameInstance.state
+
+            dispatch({
+                type: 'STATE_UPDATE',
+                payload: { state: stateUpdate }
+            })
+
+            return
+        }
+
+        if (
+            boardPiece === 'ee' ||
+            state.activePlayer !== clickedSide
+        ) {
+            dispatch({ type: 'DESELECT' })
+            return
+        }
+
+
+        const legalMoves = gameInstance.getLegalMoves([X, Y])
+
+        dispatch({
+            type: 'SELECT',
+            payload: { coord: [X, Y], potentialMoves: legalMoves }
+        })
+
+        setDragData({
+            elementRef: svgElement!,
+            currentSquare: [X, Y],
+            mouseStart: [e.clientX, e.clientY]
+        })
+    }
+
+
+    const handleMouseUp = (X: number, Y: number) => () => {
+        if (dragData) {
+            dragData.elementRef.style.left = '0'
+            dragData.elementRef.style.top = '0'
+            dragData.elementRef.style.zIndex = '0'
+        }
+
+        if (dragData?.currentSquare && state.selected) {
+            const [A, B] = dragData.currentSquare
+            if (isInPotentialMoves(A, B)) {
+                const from = [X, Y]
+                const to = [A, B]
+                const move = { from, to } as IChessMove
+                gameInstance.move(move)
+                const state = gameInstance.state
+                dispatch({
+                    type: 'STATE_UPDATE',
+                    payload: { state }
+                })
+            }
+        }
+
+        setDragData(null)
+    }
+
+
+    const setPiece = (X: number, Y: number) => {
+        let piece: TChessPiece = state.board[X][Y]
+
+        if (
+            piece === 'ee' &&
+            isInPotentialMoves(X, Y) &&
+            dragData?.currentSquare[0] === X &&
+            dragData?.currentSquare[1] === Y &&
+            state.selected
+        ) {
+            const [A, B] = state.selected
+            piece = state.board[A][B]
+        }
+
+        return piece
+
+    }
+
+    const setDragOpacity = (X: number, Y: number) => {
+        const style: React.CSSProperties = {}
+        if (
+            isInPotentialMoves(X, Y) &&
+            dragData?.currentSquare[0] === X &&
+            dragData?.currentSquare[1] === Y
+        )
+            style.opacity = '0.5'
+        return style
+    }
+
+    const flip = () => {
+        setFlipped(prevState => prevState ? false : true)
+    }
 
     useEffect(() => {
         socketProxy.on('game_state_update', (state, lastMove) => {
@@ -164,103 +293,43 @@ const Chess: React.FC = () => {
 
     }, [])
 
-
-    const test = (X: number, Y: number) => () => {
-        console.log('hahaha')
-    }
-
-
-    const handleMouseMove = (X: number, Y: number) => (e: MouseEvent) => {
-        if (!movingPiece.current || !dragStartPos.current || !dragCurrentPos) return
-        const diffX = dragStartPos.current[0] - e.clientX
-        const diffY = e.clientY - dragStartPos.current[1]
-        movingPiece.current.style.right = diffX + 'px'
-        movingPiece.current.style.top = diffY + 'px'
-        movingPiece.current.style.zIndex = '1'
-        if (X === dragCurrentPos[0] && Y === dragCurrentPos[1]) return
-        setDragCurrentPos([X, Y])
-    }
-
-    const handleMouseDown = (X: number, Y: number) => (e: MouseEvent) => {
-        const square = document.getElementById(`square${X}${Y}`)
-        const svg = square?.children[0] as SVGSVGElement | undefined
-        if (!svg) return
-        setDragCurrentPos([X, Y])
-        movingPiece.current = svg
-        dragStartPos.current = [e.clientX, e.clientY]
-    }
-
-    const handleMouseUp = () => {
-        if (movingPiece.current && dragStartPos.current) {
-            movingPiece.current.style.right = '0'
-            movingPiece.current.style.top = '0'
-            movingPiece.current.style.zIndex = '0'
-        }
-        movingPiece.current = null
-        dragStartPos.current = null
-        setDragCurrentPos(null)
-    }
-
-
-
-    const setChessPieceStyle = (X: number, Y: number) => {
-        const style: React.CSSProperties = {}
-        if (
-            dragCurrentPos &&
-            dragCurrentPos[0] === X &&
-            dragCurrentPos[1] === Y &&
-            state.board[X][Y] === 'ee'
-        )
-
-
-            style.opacity = '0'
-        return style
-    }
-
     return <div className='Chess'>
         <InGameUsername username={username} opponentUsername={opponentUsername} />
+
+        <button onClick={flip}>flip</button>
+
         <div className="boardContainer">
 
             <div className="piecesTakenWhite">
-                {state.figuresTaken.w.sort(sortFn).map((piece, index) => {
+                {state.figuresTaken.w.sort(sortPieces).map((piece, index) => {
                     return <div
                         className='pieceTaken'
                         key={index}
                     >
-                        <img src='test.svg' alt="" />
+                        <ChessPiece
+                            piece={piece}
+                        />
                     </div>
                 })}
             </div>
-
-            <div className="board">
+            <div className={`board ${flipped ? 'flipped' : ''}`}>
 
                 {state.board.map((row, X) => {
                     return <div className='row' key={X}>
 
-                        {row.map((piece, Y) => {
-                            if (
-                                piece === 'ee' &&
-                                dragCurrentPos &&
-                                dragCurrentPos[0] === X &&
-                                dragCurrentPos[1] === Y
-                            ) {
-
-                            }
-
+                        {row.map((_, Y) => {
 
                             return <div
                                 key={Y}
                                 className={`square ${setSquareStyleClass(X, Y)}`}
                                 id={`square${X}${Y}`}
-                                onClick={handleSquareClick(X, Y)}
                                 onMouseMove={handleMouseMove(X, Y)}
-                                // onClick={test(X, Y)}
                                 onMouseDown={handleMouseDown(X, Y)}
-                                onMouseUp={handleMouseUp}
+                                onMouseUp={handleMouseUp(X, Y)}
                             >
                                 <ChessPiece
-                                    piece={piece}
-                                    style={setChessPieceStyle(X, Y)}
+                                    piece={setPiece(X, Y)}
+                                    style={setDragOpacity(X, Y)}
                                 />
                             </div>
                         })}
@@ -268,10 +337,12 @@ const Chess: React.FC = () => {
                 })}
             </div>
             <div className="piecesTakenBlack">
-                {state.figuresTaken.b.sort(sortFn).map(piece => {
+                {state.figuresTaken.b.sort(sortPieces).map(piece => {
                     return <div
                         className='pieceTaken'
-                        key={uuidv4()}>
+                        key={uuidv4()}
+                    >
+                        <ChessPiece piece={piece} />
                     </div>
                 })}
             </div>

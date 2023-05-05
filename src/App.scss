@@ -11,6 +11,8 @@
 }
 
 * {
+  box-sizing: border-box;
+
   ::-webkit-scrollbar {
     position: absolute;
     width: 8px;

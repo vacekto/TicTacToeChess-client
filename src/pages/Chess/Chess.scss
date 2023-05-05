@@ -5,7 +5,6 @@
     background-color: white;
 
 
-
     .boardContainer {
         position: relative;
         display: flex;
@@ -36,6 +35,11 @@
         .board {
             border: 3px solid black;
 
+            &.flipped {
+                display: flex;
+                flex-direction: column-reverse;
+            }
+
             .row {
                 display: flex;
 
@@ -44,8 +48,6 @@
                     background: #ebefee;
                     width: 50px;
                     height: 50px;
-                    border-top: 1px solid black;
-                    border-left: 1px solid black;
                     display: flex;
                     justify-content: center;
                     align-items: center;
@@ -63,16 +65,13 @@
                     background: #8ea5ad;
                 }
 
-                .noBorderLeft {
-                    border-left: none;
-                }
-
-                .noBorderTop {
-                    border-top: none;
-                }
-
                 .potentialMove {
-                    background-color: #f1aa7ea9;
+                    background-color: #ffc9a8a9;
+
+                    &.even {
+                        background-color: #ff9959a9;
+                    }
+
                 }
 
                 .active {
