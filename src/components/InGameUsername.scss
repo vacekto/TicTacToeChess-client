@@ -8,36 +8,6 @@
     font-size: medium;
     color: $dark-gray;
     margin-bottom: 20px;
-
-    .O {
-        color: $light-player1;
-    }
-
-    .X {
-        color: $light-player2;
-    }
-
-    .w {
-        color: white;
-        -webkit-text-stroke: 2px black;
-
-    }
-
-    .b {
-        color: black;
-    }
-
-
-
-    /* width and color */
-    .localPlayer {
-        color: $light-player1;
-    }
-
-    .opponent {
-        color: $light-player2;
-    }
-
 }
 
 #dark {}

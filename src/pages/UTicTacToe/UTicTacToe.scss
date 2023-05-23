@@ -34,8 +34,12 @@
                     width: 93px;
                     height: 93px;
 
-                    svg {
-                        stroke: blue;
+                    &.circle {
+                        stroke: $light-player1;
+                    }
+
+                    &.cross {
+                        stroke: $light-player2;
                     }
                 }
 
@@ -48,6 +52,7 @@
                         height: 30px;
                         border-top: 1px solid black;
                         border-left: 1px solid black;
+                        padding: 5px;
 
                         circle {
                             stroke: $light-player1;

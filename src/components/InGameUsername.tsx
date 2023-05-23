@@ -1,6 +1,4 @@
 import './InGameUsername.scss'
-import { useContext } from 'react'
-import { context } from '@/context/GlobalStateProvider'
 
 interface IInGameUsernameProps {
     username: string
@@ -8,13 +6,12 @@ interface IInGameUsernameProps {
 }
 
 const InGameUsername: React.FC<IInGameUsernameProps> = ({ username, opponentUsername }) => {
-    const { gameSide, opponentGameSide } = useContext(context)
 
     return <div className='InGameUsername'>
-        <div className={"username " + gameSide}>
+        <div className={"username"}>
             {username}
         </div>
-        <div className={"username + " + opponentGameSide}>
+        <div className={"username"}>
             {opponentUsername}
         </div>
     </div >;

@@ -5,7 +5,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-
+    background-color: white;
     border: 2px solid $neutral;
     padding: 50px;
 
@@ -22,6 +22,7 @@
                 height: 30px;
                 border-top: 1px solid #dcdcdc;
                 border-left: 1px solid #dcdcdc;
+                padding: 5px;
 
                 svg {
                     circle {

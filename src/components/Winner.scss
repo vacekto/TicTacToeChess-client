@@ -1,0 +1,38 @@
+@import '@/util/CSS/constants.scss';
+
+.Winner {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    margin: 10px;
+    font-family: LuckiestGuy;
+
+    .outcome {
+        display: flex;
+        justify-content: center;
+        color: $dark-gray;
+        margin: 30px;
+        align-items: center;
+
+        svg {
+            margin-right: 10px;
+            width: 30pX;
+            height: 30px;
+        }
+
+        &.X {
+            stroke: $light-player2;
+        }
+
+        &.O {
+            stroke: $light-player1;
+        }
+    }
+
+    .actions {
+        button {
+            margin: 5px;
+        }
+    }
+}

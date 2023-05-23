@@ -5,7 +5,6 @@ import {
     IGameInvite,
 } from "shared";
 import { socketProxy } from '@/util/socketSingleton';
-import { act } from "@testing-library/react";
 
 
 export interface IGlobalState {

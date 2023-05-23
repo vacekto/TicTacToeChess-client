@@ -3,7 +3,7 @@ import { useContext, CSSProperties, useRef } from 'react';
 import { context } from '@/context/GlobalStateProvider';
 import { ReactComponent as UsersSVG } from '@/util/svg/plain/users.svg'
 import { ReactComponent as EnvelopeSVG } from '@/util/svg/plain/envelope.svg'
-
+import LightModeSvg from '@/util/svg/components/LightModeSVG'
 
 interface ITopBarProps {
     setActiveSideBar: React.Dispatch<React.SetStateAction<"gameInvites" | "usersOnline" | null>>

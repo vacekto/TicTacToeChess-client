@@ -4,22 +4,23 @@ import ModalExit from '@/util/svg/components/ModalExit'
 
 
 interface IGenericModalProps {
-    children: ReactNode
+    children?: ReactNode
     visible: boolean
-    exitModal: () => void
+    exitModal?: () => void
 }
 
 const GenericModal: React.FC<IGenericModalProps> = ({ children, visible, exitModal }) => {
 
-    const exitOnClick = () => {
-        exitModal()
+    const backgroundClick = () => {
+        if (typeof exitModal === 'function') exitModal()
     }
 
-    const stopPropagation = (event: MouseEvent<HTMLElement>) => {
+    const noExitOnClick = (event: MouseEvent<HTMLElement>) => {
         event.stopPropagation();
     }
 
     useEffect(() => {
+        if (typeof exitModal !== 'function') return
         document.addEventListener('keydown', e => {
             if (e.key === 'Escape') exitModal()
         })
@@ -28,13 +29,15 @@ const GenericModal: React.FC<IGenericModalProps> = ({ children, visible, exitMod
     return <div
         className='GenericModal'
         style={visible ? {} : { display: 'none' }}
-        onClick={exitOnClick}
+        onClick={backgroundClick}
     >
-        <div className="container" onClick={stopPropagation}>
-            <div className="exitIcon" onClick={exitModal}>
-                <ModalExit />
-            </div>
-
+        <div className="container" onClick={noExitOnClick}>
+            {exitModal ?
+                <div className="exitIcon" onClick={exitModal}>
+                    <ModalExit />
+                </div>
+                : null
+            }
             {children}
         </div>
     </div>

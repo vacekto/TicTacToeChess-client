@@ -1,7 +1,7 @@
 @import '@/util/CSS/constants.scss';
 
-$option-width: 200px;
-$option-height: 35px;
+$option-width: 250px;
+$option-height: 50px;
 $options-height: 200px;
 
 .GenericSelect {
@@ -53,9 +53,12 @@ $options-height: 200px;
         border-radius: 5px;
 
         .arrowhead {
-            min-width: $option-height;
-            padding: 10px;
-            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            max-height: $option-height;
+            width: $option-height ;
+            padding: 15px;
             transition: transform .1s;
         }
 
@@ -87,7 +90,7 @@ $options-height: 200px;
             overflow: auto;
             opacity: 1;
             z-index: 2;
-            animation: hide-scroll 1.2s backwards;
+            animation: hide-scroll .1s backwards;
         }
 
     }

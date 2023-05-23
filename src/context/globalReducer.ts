@@ -24,6 +24,8 @@ export interface IGlobalState {
     gameInvites: IGameInviteWithTimestamp[],
     inviteNotifications: IGameInviteWithTimestamp[],
     activeGenericSelectId: string,
+    ticTacToeBoardSize?: number
+    ticTacToeWinCondition?: number
 };
 
 export type TGlobalStateAction =
@@ -67,8 +69,8 @@ const reducer = (prevState: IGlobalState, action: TGlobalStateAction) => {
             index = prevState.gameInvites.findIndex(inv => {
                 return (
                     invite.game === inv.game &&
-                    invite.invitee === inv.invitee &&
-                    invite.sender === inv.sender
+                    invite.inviteeUsername === inv.inviteeUsername &&
+                    invite.senderUsername === inv.senderUsername
                 )
             })
 
@@ -87,8 +89,8 @@ const reducer = (prevState: IGlobalState, action: TGlobalStateAction) => {
             index = prevState.gameInvites.findIndex(inv => {
                 return (
                     invite.game === inv.game &&
-                    invite.invitee === inv.invitee &&
-                    invite.sender === inv.sender
+                    invite.inviteeUsername === inv.inviteeUsername &&
+                    invite.senderUsername === inv.senderUsername
                 )
             })
 
@@ -101,8 +103,8 @@ const reducer = (prevState: IGlobalState, action: TGlobalStateAction) => {
             index = prevState.inviteNotifications.findIndex(inv => {
                 return (
                     invite.game === inv.game &&
-                    invite.invitee === inv.invitee &&
-                    invite.sender === inv.sender
+                    invite.inviteeUsername === inv.inviteeUsername &&
+                    invite.senderUsername === inv.senderUsername
                 )
             })
             if (index === -1) return update

@@ -3,16 +3,16 @@ import { ReactNode, useState, useRef, useEffect } from 'react'
 import Arrowhead from '@/util/svg/components/ArrowHead';
 import { v4 as uuidv4 } from 'uuid';
 
-export interface ISelectedOption {
-    index: number,
-    item: ReactNode
-}
-
-interface ComponentElement extends HTMLDivElement {
+interface CustomSelectElement extends HTMLDivElement {
     dataset: {
         componentId: string
         componentName: 'generic-select'
     }
+}
+
+export interface ISelectedOption {
+    index: number,
+    item: ReactNode
 }
 
 export interface IExtendState {
@@ -43,7 +43,7 @@ const GenericSelect: React.FC<IGenericSelectProps> = ({
     const [renderedOptions, setRenderedOptions] = useState<ReactNode[]>([])
     const [indexOfSelected, setIndexOfSelected] = useState<number>(-1)
     const [extended, setExtended] = useState<boolean>(false)
-    const componentRef = useRef<ComponentElement>({} as ComponentElement)
+    const componentRef = useRef<CustomSelectElement>({} as CustomSelectElement)
 
     const toggleExtend = () => {
         if (typeof extendCallback === 'function') extendCallback({
@@ -80,8 +80,9 @@ const GenericSelect: React.FC<IGenericSelectProps> = ({
 
 
     useEffect(() => {
+        if (!children) return
         if (children instanceof Array) setRenderedOptions(children)
-        setRenderedOptions([children])
+        else setRenderedOptions([children])
     }, [children])
 
 
@@ -94,12 +95,11 @@ const GenericSelect: React.FC<IGenericSelectProps> = ({
             const newIndex = event?.detail?.index
             if (
                 typeof newIndex === 'number' &&
-                newIndex > -2 &&
+                newIndex >= -1 &&
                 newIndex < renderedOptions.length
             )
                 setIndexOfSelected(newIndex)
         }) as EventListener)
-
 
     }, [])
 

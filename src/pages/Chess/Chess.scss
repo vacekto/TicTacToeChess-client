@@ -5,6 +5,17 @@
     background-color: white;
 
 
+    .displayOptions {
+        display: flex;
+
+        justify-content: space-between;
+
+        button {
+            width: 198px;
+            margin-top: 8px;
+        }
+    }
+
     .boardContainer {
         position: relative;
         display: flex;
@@ -53,13 +64,7 @@
                     align-items: center;
                     position: relative;
 
-                    svg {
-                        width: 100%;
-                        height: 100%;
-                        position: absolute;
-                    }
                 }
-
 
                 .even {
                     background: #8ea5ad;
@@ -71,13 +76,32 @@
                     &.even {
                         background-color: #ff9959a9;
                     }
-
                 }
+
+
 
                 .active {
                     background-color: #ff924e;
                 }
+
+                .lastMove {
+                    background-color: rgba(252, 241, 160, 0.719);
+
+                    &.even {
+                        background-color: rgba(252, 241, 160, 0.719);
+
+                    }
+                }
+
+
+
+                svg {
+                    width: 100%;
+                    height: 100%;
+                    position: absolute;
+                }
             }
+
         }
     }
 }

@@ -12,11 +12,15 @@ interface IInGameOptionsProps {
 const InGameOptions: React.FC<IInGameOptionsProps> = ({
   resetCb,
 }) => {
-  const { updateGlobalState, switchLightTheme } = useContext(context)
+  const { updateGlobalState, switchLightTheme, gameMode } = useContext(context)
 
   const handleHomeCklick = () => {
     updateGlobalState({
-      gameName: ''
+      gameName: '',
+      gameMode: '',
+      opponentUsername: '',
+      opponentGameSide: '',
+      gameSide: '',
     })
   }
 
@@ -24,9 +28,12 @@ const InGameOptions: React.FC<IInGameOptionsProps> = ({
     <div onClick={handleHomeCklick}>
       <Home />
     </div>
-    <div onClick={resetCb}>
-      <Repeat />
-    </div>
+    {
+      gameMode === 'multiplayer' ? null :
+        <div onClick={resetCb}>
+          <Repeat />
+        </div>
+    }
     <div onClick={switchLightTheme}>
       <LightMode />
     </div>

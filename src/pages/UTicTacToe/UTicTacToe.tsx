@@ -1,7 +1,6 @@
 import { useContext, useEffect } from 'react'
-import useGame from "@/util/useGame";
 import InGameOptions from '@/components/InGameOptions';
-import InGameScore from '@/components/TicTacToeScore';
+import InGameScore from '@/components/InGameScore';
 import InGameUsername from "@/components/InGameUsername";
 import Switch from '@/components/Switch';
 import CircleSVG from '@/util/svg/components/CircleSVG';
@@ -10,13 +9,13 @@ import reducer from './reducer'
 import './UTicTacToe.scss'
 import { context } from '@/context/GlobalStateProvider'
 import { socketProxy } from '@/util/socketSingleton';
+import SelectSideModal from '@/components/modals/SelectSideModal';
+import Winner from '@/components/Winner';
 import {
-    IUTicTacToeMove,
     IUTicTacToeState,
-    TGameMode,
     TTicTacToeSide,
-    UTicTacToeGame
 } from 'shared';
+import useUTicTacToe from './useUTicTacToe';
 import {
     useReducer,
 } from 'react'
@@ -29,11 +28,12 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
     const {
         username,
         opponentUsername,
-        gameMode,
         gameSide,
-        updateGlobalState,
+        leaveGame
     } = useContext(context)
-    const { gameInstance } = useGame('uTicTacToe', gameMode as TGameMode) as { gameInstance: UTicTacToeGame }
+
+
+    const gameInstance = useUTicTacToe()
     const [state, dispatch] = useReducer(reducer, {
         ...gameInstance.state,
         score: {
@@ -42,6 +42,23 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
             draw: 0
         }
     })
+
+    const renderSquareDone = (SX: number, SY: number) => {
+        const segmentStatus = state.segmentBoard[SX][SY]
+
+        if (segmentStatus === 'O') return (
+            <div className={`squareDone ` + 'circle'}>
+                <CircleSVG />
+            </div>
+        )
+        if (segmentStatus === 'X') return (
+            <div className={`squareDone ` + 'cross'}>
+                <CrossSVG />
+            </div>
+        )
+
+        return null
+    }
 
     const resetCb = () => {
         gameInstance.resetState()
@@ -67,11 +84,7 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
     const handleClick = (
         SX: number, SY: number, X: number, Y: number
     ) => () => {
-        if (
-            gameMode === 'multiplayer' &&
-            state.activePlayer !== gameSide
-        )
-            return
+        if (state.activePlayer !== gameSide) return
         if (state.board[SX][SY][X][Y]) return
         if (state.winner) return
         if (state.activeSegment) {
@@ -81,8 +94,6 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
 
         const move = { SX, SY, X, Y }
         gameInstance.move(move)
-        if (gameMode === 'multiplayer')
-            socketProxy.emit('game_move', move)
         const stateUpdate = gameInstance.state
         dispatch({ type: 'STATE_UPDATE', payload: { state: stateUpdate } })
     }
@@ -95,22 +106,13 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
 
     useEffect(() => {
 
-        socketProxy.on('game_state_update', (state, lastMove) => {
-            gameInstance.move(lastMove as IUTicTacToeMove)
+        socketProxy.on('game_state_update', (state) => {
+            console.log(state)
+            gameInstance.updateState(state as IUTicTacToeState)
             dispatch({ type: 'STATE_UPDATE', payload: { state: state as IUTicTacToeState } })
         })
 
-        socketProxy.on('leave_game', () => {
-            updateGlobalState({
-                gameName: '',
-                gameMode: '',
-                gameSide: '',
-                opponentGameSide: '',
-                opponentUsername: '',
-            })
-        })
-
-
+        socketProxy.on('leave_game', leaveGame)
 
         return () => {
             socketProxy.removeListener('game_state_update')
@@ -118,8 +120,8 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
         }
     }, [])
 
-
     return <div className='UTicTacToe'>
+        <SelectSideModal />
         <InGameUsername username={username} opponentUsername={opponentUsername} />
         <InGameScore score={{ ...state.score }} />
         <div className="ultimateBoard">
@@ -129,9 +131,7 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
                         return <div
                             className={`ultimateSquare ${markActiveSegment(SX, SY)}`}
                             key={SY}>
-                            {/*<div className='squareDone'>
-                                <CircleSVG />
-                    </div>*/}
+                            {renderSquareDone(SX, SY)}
                             {ultimateSquare.map((row, X) => {
                                 return <div className='row' key={X}>
                                     {row.map((square, Y) => {
@@ -150,8 +150,16 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
                 </div>
             })}
         </div>
-        <Switch activePlayer={state.activePlayer} />
-        <InGameOptions resetCb={resetCb} />
+        {gameInstance.winner ?
+            <Winner
+                winner={gameInstance.winner}
+                resetCb={resetCb}
+            /> :
+            <>
+                <Switch activePlayer={state.activePlayer} />
+                <InGameOptions resetCb={resetCb} />
+            </>
+        }
     </div>;
 };
 

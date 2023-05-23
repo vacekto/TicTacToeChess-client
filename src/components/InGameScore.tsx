@@ -1,4 +1,4 @@
-import './TicTacToeScore.scss'
+import './InGameScore.scss'
 import CircleSVG from '@/util/svg/components/CircleSVG';
 import CrossSVG from '@/util/svg/components/CrossSVG';
 import Scales from '@/util/svg/components/ScalesSVG';

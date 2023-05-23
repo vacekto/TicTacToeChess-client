@@ -65,16 +65,18 @@ export const subscribeToSocketEvents: TSubscribeToSocketEvents = (socket, update
         updateGlobalState(stateUpdate)
     })
 
-    socket.on('start_game', (gameName, opponentUsername, gameSide) => {
-        const opponentGameSide: TGameSide = gameName === 'chess' ?
-            (gameSide === 'w' ? 'b' : 'w') :
-            (gameSide === 'O' ? 'X' : 'O')
+    socket.on('start_game', (
+        gameName,
+        opponentUsername,
+        ticTacToeBoardSize,
+        ticTacToeWinCondition
+    ) => {
         updateGlobalState({
             gameName,
             opponentUsername,
             gameMode: 'multiplayer',
-            opponentGameSide,
-            gameSide
+            ticTacToeBoardSize,
+            ticTacToeWinCondition
         })
     })
 
@@ -92,6 +94,14 @@ export const subscribeToSocketEvents: TSubscribeToSocketEvents = (socket, update
     })
 
     socket.on('game_invite', handleNewInvite)
+
+    socket.on('disconnect', () => {
+        updateGlobalState({
+            gameName: '',
+            gameMode: '',
+            gameSide: '',
+        })
+    })
 }
 
 

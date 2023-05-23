@@ -1,13 +1,9 @@
 import './InviteToGameModal.scss'
 import GenericModal from './GenericModal';
-import CircleSVG from '@/util/svg/components/CircleSVG';
-import CrossSVG from '@/util/svg/components/CrossSVG';
 import { ISelectedOption } from '../GenericSelect';
-import { ReactNode, useEffect, useRef, useState, useContext } from 'react';
-import { ReactComponent as Wn } from '@/util/svg/plain/WKnight.svg'
-import { ReactComponent as Bn } from '@/util/svg/plain/BKnight.svg'
+import { ReactNode, useEffect, useState, useContext } from 'react';
 import GenericSelectDecorator from '../GenericSelectDecorator';
-import { IGameInvite, TGameName, TGameSide } from 'shared';
+import { IGameInvite, TGameName } from 'shared';
 import { socketProxy } from '@/util/socketSingleton';
 import { context } from '@/context/GlobalStateProvider';
 
@@ -23,14 +19,11 @@ interface IInviteToGameModalProps {
     inviteeUsername: string
 }
 
-
-
 const InviteToGameModal: React.FC<IInviteToGameModalProps> = ({ visible, exitModal, inviteeUsername }) => {
     const [selectedGame, setSelectedGame] = useState<TGameName | ''>('')
-    const { username } = useContext(context)
-    // const [selectedSide, setSelectedSide] = useState<TGameSide | ''>('')
-    // const [sideOptions, setSideOptions] = useState<TOptions<TGameSide>>([])
-    // const sidesEvetTargetRef = useRef(new EventTarget())
+    const [size, setSize] = useState<number>()
+    const [winCondition, setWinCondition] = useState<number>()
+    const { updateGlobalState, username } = useContext(context)
 
     const gameOptions: TOptions<TGameName> = [{
         render: 'Tic tac toe',
@@ -43,32 +36,20 @@ const InviteToGameModal: React.FC<IInviteToGameModalProps> = ({ visible, exitMod
         value: 'chess'
     }]
 
-    // const gameSides: Record<TGameName, TOptions<TGameSide>> = {
-    //     chess: [{
-    //         render: <Wn />,
-    //         value: 'w'
-    //     },
-    //     {
-    //         render: <Bn />,
-    //         value: 'b'
-    //     }],
-    //     ticTacToe: [{
-    //         render: <CircleSVG />,
-    //         value: 'O'
-    //     },
-    //     {
-    //         render: <CrossSVG />,
-    //         value: 'X'
-    //     }],
-    //     uTicTacToe: [{
-    //         render: <CircleSVG />,
-    //         value: 'O'
-    //     },
-    //     {
-    //         render: <CrossSVG />,
-    //         value: 'X'
-    //     }]
-    // }
+    const sizeOptions = [3, 5, 8, 10, 12]
+    const winConditionOptions = [3, 4, 5, 6, 7]
+        .filter(i => size ? i <= size : false)
+
+    const selectSize = (option: ISelectedOption) => {
+        const newSize = option.item as number
+        setSize(newSize)
+    }
+
+    const selectWinCondition = (option: ISelectedOption) => {
+        const newWinCondition = option.item as number
+        setWinCondition(newWinCondition)
+    }
+
 
 
     const selectGameCallback = (selectedOption: ISelectedOption) => {
@@ -78,59 +59,64 @@ const InviteToGameModal: React.FC<IInviteToGameModalProps> = ({ visible, exitMod
         setSelectedGame(selectedGameUpdate)
     }
 
-    // const selectSideCallback = (selectedOption: ISelectedOption) => {
-    //     const index = selectedOption.index
-    //     let selectedSideUpdate: TGameSide | ''
-    //     selectedSideUpdate = index === -1 ? '' : sideOptions[index].value
-    //     setSelectedSide(selectedSideUpdate)
-    // }
 
     const inviteCallback = () => {
-        if (selectedGame) {
-            const invite: IGameInvite = {
-                game: selectedGame,
-                invitee: inviteeUsername,
-                sender: username
-            }
-            socketProxy.emit('game_invite', invite)
+        if (!selectedGame) return
+
+        const invite: IGameInvite = {
+            game: selectedGame,
+            inviteeUsername: inviteeUsername,
+            senderUsername: username,
+            ticTacToeBoardSize: size,
+            ticTacToeWinCondition: winCondition
         }
+
+        socketProxy.emit('game_invite', invite)
         exitModal()
     }
 
-    // useEffect(() => {
-    //     const sideOptionsUpdate = selectedGame ? gameSides[selectedGame] : []
-    //     setSideOptions(sideOptionsUpdate)
-    //     setSelectedSide('')
 
-    //     const selectSideEvent = new CustomEvent('selectSideIndex', {
-    //         detail: { index: -1 }
-    //     })
-
-    //     sidesEvetTargetRef.current.dispatchEvent(selectSideEvent)
-    // }, [selectedGame])
+    useEffect(() => {
+        if (
+            !size ||
+            winCondition && size && winCondition > size
+        )
+            setWinCondition(undefined)
+    }, [size])
 
 
-    return <GenericModal visible={visible} exitModal={exitModal}>
+    return <GenericModal visible={visible} exitModal={exitModal} >
         <div className='InviteToGameModal'>
-
             <h3>Game</h3>
             <GenericSelectDecorator
                 options={gameOptions.map(o => o.render)}
                 selectCallback={selectGameCallback}
             />
-            {/* 
-            <h3>Side</h3>
-            <GenericSelectDecorator
-                options={sideOptions.map(o => o.render)}
-                selectCallback={selectSideCallback}
-                eventTarget={sidesEvetTargetRef.current}
-            /> 
-            */}
+
+            {selectedGame === 'ticTacToe' ? <>
+                <h3>Board dimension</h3>
+                <GenericSelectDecorator
+                    options={sizeOptions}
+                    selectCallback={selectSize}
+                />
+            </> : null}
+
+            {selectedGame === 'ticTacToe' ? <>
+                <h3>Win condition</h3>
+                <GenericSelectDecorator
+                    options={winConditionOptions}
+                    selectCallback={selectWinCondition}
+                />
+            </> : null}
 
             <button
                 className='customButton submitButton'
                 onClick={inviteCallback}
-            >send invite</button>
+            >
+                send invite
+            </button>
+
+
         </div >
 
     </GenericModal>

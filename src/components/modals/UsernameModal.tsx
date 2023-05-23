@@ -65,7 +65,7 @@ const UsernameModal: React.FC<ITopBarProps> = () => {
     }, [showUsernameModal])
 
 
-    return <GenericModal visible={showUsernameModal} exitModal={exit}>
+    return <GenericModal visible={showUsernameModal} exitModal={exit} >
         <div className="UsernameModal"  >
             <h2>Change username</h2>
 

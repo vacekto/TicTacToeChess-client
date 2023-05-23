@@ -27,7 +27,8 @@
         align-items: center;
         position: relative;
 
-        div {
+        &>div {
+            margin-right: 30px;
             cursor: pointer;
             width: 30px;
             height: 30px;
@@ -49,8 +50,9 @@
             }
         }
 
+
+
         .usersOnline {
-            margin-right: 30px;
             padding-top: 4px;
         }
 

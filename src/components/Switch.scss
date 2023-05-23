@@ -2,22 +2,15 @@
 
 $height: 25px;
 $width: 55px;
-$icon-padding: 1px;
-$indicator-overflow: 5px;
-$indicator-color: rgba(156, 156, 156, 0.37);
+$icon-padding: 3px;
+$indicator-overflow: 3px;
+$indicator-color: rgba(156, 156, 156, 0.27);
 $left-icon-light: $light-player1;
 $right-icon-light: $light-player2;
 $left-icon-dark: $dark-player1;
 $right-icon-dark: $dark-player2;
 $border-light: #a4b5b844;
 
-.flexEnd {
-    justify-content: flex-end;
-}
-
-.flexStart {
-    justify-content: flex-start;
-}
 
 .Switch {
     margin: 30px 0px;
@@ -29,6 +22,7 @@ $border-light: #a4b5b844;
     border-radius: $height;
     position: relative;
     padding: 0 1px;
+
 
     .icons {
         width: 100%;
@@ -44,6 +38,7 @@ $border-light: #a4b5b844;
             justify-content: center;
             align-items: center;
             z-index: 2;
+            padding: 3px;
         }
 
         .left {
@@ -62,6 +57,8 @@ $border-light: #a4b5b844;
 
         .active {
             svg {
+                transition: .2s;
+                transition-timing-function: ease-out;
                 stroke: white
             }
         }
@@ -76,6 +73,9 @@ $border-light: #a4b5b844;
         align-items: center;
         border-radius: 50%;
         z-index: 1;
+        left: 1px;
+        transition: .2s;
+        transition-timing-function: ease-out;
 
         .indicator {
             position: absolute;
@@ -96,6 +96,23 @@ $border-light: #a4b5b844;
         }
 
     }
+
+    &.flexEnd {
+        // justify-content: flex-end;
+
+        .indicatorContainer {
+            left: 27px
+        }
+    }
+
+    &.flexStart {
+        // justify-content: flex-start;
+
+        .indicatorContainer {
+            left: 1px;
+        }
+    }
+
 }
 
 

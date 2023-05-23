@@ -35,6 +35,7 @@ interface IGlobalContext extends IGlobalState {
     handleNewInvite: (newInvite: IGameInvite) => void
     removeInvite: (invite: IGameInviteWithTimestamp) => void
     removeNotification: (invite: IGameInviteWithTimestamp) => void
+    leaveGame: () => void
 }
 
 export const context = createContext<IGlobalContext>(defaultGlobalState as IGlobalContext);
@@ -47,18 +48,33 @@ interface IContextProviderProps {
 const ContextProvider: React.FC<IContextProviderProps> = ({ children }) => {
     const [globalState, dispatch] = useReducer(reducer, defaultGlobalState)
 
+
     const updateGlobalState = (stateUpdate: Partial<IGlobalState>) => {
+
+        if (
+            globalState.gameMode === 'multiplayer' &&
+            stateUpdate.gameMode === ''
+        ) {
+            socketProxy.emit('leave_game')
+        }
 
         dispatch({
             type: 'STATE_UPDATE',
             payload: { stateUpdate }
         })
 
-        if (
-            globalState.gameMode === 'multiplayer' &&
-            stateUpdate.gameMode !== 'multiplayer'
-        )
-            socketProxy.emit('leave_game')
+    }
+
+    const leaveGame = () => {
+        updateGlobalState({
+            gameMode: '',
+            gameName: '',
+            gameSide: '',
+            opponentGameSide: '',
+            opponentUsername: '',
+            ticTacToeBoardSize: undefined,
+            ticTacToeWinCondition: undefined,
+        })
     }
 
     const switchLightTheme = () => {
@@ -88,7 +104,6 @@ const ContextProvider: React.FC<IContextProviderProps> = ({ children }) => {
     const handleNewInvite = (invite: IGameInvite) => {
         const newInvite = invite as IGameInviteWithTimestamp
         newInvite.timestamp = Date.now()
-
         dispatch({
             type: 'NEW_INVITATION',
             payload: { invite: newInvite }
@@ -107,7 +122,8 @@ const ContextProvider: React.FC<IContextProviderProps> = ({ children }) => {
         updateGlobalState,
         handleNewInvite,
         removeInvite,
-        removeNotification
+        removeNotification,
+        leaveGame
     }}>
         {children}
     </context.Provider >;

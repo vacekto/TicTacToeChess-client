@@ -12,11 +12,14 @@
 
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 
   ::-webkit-scrollbar {
     position: absolute;
     width: 8px;
     border-radius: 8px;
+    background-color: white;
   }
 
   ::-webkit-scrollbar-thumb {

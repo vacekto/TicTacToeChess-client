@@ -10,10 +10,11 @@ interface IGameInviteProps {
 
 const GameInvite: React.FC<IGameInviteProps> = ({ invite }) => {
     const [counter, setCounter] = useState<number>(Math.floor(((60000 - Date.now() + invite.timestamp) / 1000) % 60))
-    const { removeInvite } = useContext(context)
+    const { removeInvite, updateGlobalState } = useContext(context)
 
     const handleAccept = () => {
         socketProxy.emit('accept_invite', invite)
+        removeInvite(invite)
     }
 
     const handleDecline = () => {
@@ -39,7 +40,7 @@ const GameInvite: React.FC<IGameInviteProps> = ({ invite }) => {
             <div className="info">
                 <div>
                     <div>Opponent</div>
-                    <div>{invite.sender}</div>
+                    <div>{invite.senderUsername}</div>
                 </div>
                 <div>
                     <div>Game</div>

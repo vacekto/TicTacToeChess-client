@@ -9,7 +9,12 @@ interface IGameOptionProps {
 
 const GameOption: React.FC<IGameOptionProps> = ({ children, selectGame, gameName }) => {
 
+    const games = {
+
+    }
+
     return <div className='GameOption' onClick={selectGame}>
+
         <div className="icon">
             {children}
         </div>

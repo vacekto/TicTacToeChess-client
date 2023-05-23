@@ -1,6 +1,6 @@
 import './Chess.scss'
-import { useReducer, useContext, useEffect, MouseEvent, useRef, useState } from 'react';
-import { ChessGame, IChessMove, IChessState, TChessPiece } from 'shared';
+import { useReducer, useContext, useEffect, MouseEvent, useState } from 'react';
+import { IChessMove, IChessState, TChessPiece } from 'shared';
 import InGameOptions from '@/components/InGameOptions';
 import InGameUsername from '@/components/InGameUsername';
 import { context } from '@/context/GlobalStateProvider'
@@ -8,9 +8,10 @@ import ChessHistory from './ChessHistory';
 import reducer from './reducer'
 import { socketProxy } from '@/util/socketSingleton';
 import { v4 as uuidv4 } from 'uuid';
-import useChessInstance from './useChessInstance'
-
+import SelectSideModal from '@/components/modals/SelectSideModal';
 import ChessPiece from '@/util/svg/components/ChessPiece'
+import useChess from './useChess';
+import Winner from '@/components/Winner';
 
 interface IDragData {
     elementRef: SVGSVGElement
@@ -22,11 +23,16 @@ interface IDragData {
 const Chess: React.FC = () => {
     const {
         username,
+        gameMode,
+        gameSide,
         opponentUsername,
-        updateGlobalState
+        updateGlobalState,
+        leaveGame
     } = useContext(context)
+
+    const gameInstance = useChess()
     const [flipped, setFlipped] = useState<boolean>(false)
-    const gameInstance = useChessInstance()
+    const [showLastMove, setShowLastMove] = useState<boolean>(true)
     const [dragData, setDragData] = useState<IDragData | null>(null)
     const [state, dispatch] = useReducer(reducer, {
         ...gameInstance.state,
@@ -35,22 +41,16 @@ const Chess: React.FC = () => {
     })
 
     const isInPotentialMoves = (X: number, Y: number) => {
-        let outcome = false
-
         for (const [A, B] of state.potentialMoves) {
-            if (X === A && Y === B) {
-                outcome = true
-                break
-            }
+            if (X === A && Y === B) return true
         }
-
-        return outcome
+        return false
     }
 
     const setSquareStyleClass = (X: number, Y: number) => {
         let className = ''
         const SE = state.selected
-
+        const LM = state.lastMove
         const i = flipped ? 1 : 0
 
         if ((X + Y) % 2 === i) className += 'even '
@@ -58,14 +58,22 @@ const Chess: React.FC = () => {
         state.potentialMoves.forEach(([A, B]) => {
             if (A === X && B === Y) className += 'potentialMove '
         })
+
+        if (!LM || !showLastMove) return className
+        if (LM.from[0] === X && LM.from[1] === Y) className += 'lastMove '
+        if (LM.to[0] === X && LM.to[1] === Y) className += 'lastMove '
+
         return className
     }
 
     const resetCb = () => {
-        gameInstance.resetGame()
+        gameInstance.resetState()
         const state = gameInstance.state as IChessState
+        updateGlobalState({
+            gameSide: 'w'
+        })
         dispatch({
-            type: 'RESET_STATE',
+            type: 'STATE_UPDATE',
             payload: { state }
         })
     }
@@ -122,21 +130,27 @@ const Chess: React.FC = () => {
         dragData.elementRef.style.left = mouseDiffY + 'px'
         dragData.elementRef.style.zIndex = '1'
 
-        const isOutOfBounds = (X: number, Y: number) => {
-            return (
-                0 >= X &&
-                X >= 7 &&
-                0 >= Y &&
-                Y >= 7
-            )
-        }
-
         const i = flipped ? -1 : 1
         const squareDiffX = Math.floor((mouseDiffX + i * 25) / (i * 50))
         const squareDiffY = Math.floor((mouseDiffY + 25) / 50)
 
         const newSquareX = X + squareDiffX
         const newSquareY = Y + squareDiffY
+
+        const isOutOfBounds = (X: number, Y: number) => {
+            return (
+                0 > X || 7 < X ||
+                0 > Y || 7 < Y
+            )
+        }
+
+        const isCurrentSquare = (X: number, Y: number) => {
+            return (
+                X === dragData.currentSquare[0] &&
+                Y === dragData.currentSquare[1]
+            )
+
+        }
 
         if (isOutOfBounds(newSquareX, newSquareY)) {
             dragData.elementRef.style.left = '0'
@@ -146,10 +160,7 @@ const Chess: React.FC = () => {
             return
         }
 
-        if (
-            newSquareX === dragData.currentSquare[0] &&
-            newSquareY === dragData.currentSquare[1]
-        )
+        if (isCurrentSquare(newSquareX, newSquareY))
             return
 
         setDragData(prevState => {
@@ -171,9 +182,10 @@ const Chess: React.FC = () => {
         ) {
 
             const [A, B] = state.selected
-            const from = [A, B]
-            const to = [X, Y]
-            const move = { from, to } as IChessMove
+            const move: IChessMove = {
+                from: [A, B],
+                to: [X, Y]
+            }
 
             gameInstance.move(move)
 
@@ -183,13 +195,12 @@ const Chess: React.FC = () => {
                 type: 'STATE_UPDATE',
                 payload: { state: stateUpdate }
             })
-
             return
         }
 
         if (
             boardPiece === 'ee' ||
-            state.activePlayer !== clickedSide
+            gameSide !== clickedSide
         ) {
             dispatch({ type: 'DESELECT' })
             return
@@ -270,34 +281,32 @@ const Chess: React.FC = () => {
         setFlipped(prevState => prevState ? false : true)
     }
 
+    const displayLastMove = () => {
+        setShowLastMove(prevState => prevState ? false : true)
+    }
+
     useEffect(() => {
-        socketProxy.on('game_state_update', (state, lastMove) => {
-            gameInstance.move(lastMove as IChessMove)
+
+        socketProxy.on('game_state_update', (state) => {
+            gameInstance.updateState(state as IChessState, true)
             dispatch({ type: 'STATE_UPDATE', payload: { state: state as IChessState } })
         })
 
-        socketProxy.on('leave_game', () => {
-            updateGlobalState({
-                gameName: '',
-                gameMode: '',
-                gameSide: '',
-                opponentGameSide: '',
-                opponentUsername: '',
-            })
-        })
+        socketProxy.on('new_game', resetCb)
+        socketProxy.on('leave_game', leaveGame)
+
 
         return () => {
             socketProxy.removeListener('game_state_update')
             socketProxy.removeListener('leave_game')
+            socketProxy.removeListener('new_game')
         }
 
     }, [])
 
     return <div className='Chess'>
+        <SelectSideModal />
         <InGameUsername username={username} opponentUsername={opponentUsername} />
-
-        <button onClick={flip}>flip</button>
-
         <div className="boardContainer">
 
             <div className="piecesTakenWhite">
@@ -347,15 +356,24 @@ const Chess: React.FC = () => {
                 })}
             </div>
         </div>
-        <InGameOptions resetCb={resetCb} />
+        <div className="displayOptions">
+            <button className='customButton' onClick={flip}>Flip board</button>
+            <button className='customButton' onClick={displayLastMove} >{`${showLastMove ? 'Hide' : 'Display'} last move`}</button>
+        </div>
+
         {state.winner ?
-            <ChessHistory
-                backwardCb={backwardCb}
-                forwardCb={forwardCb}
-                fastBackwardCb={fastBackwardCb}
-                fastForwardCb={fastForwardCb}
-            /> :
-            null
+            <>
+                <Winner
+                    winner={state.winner}
+                    resetCb={resetCb} />
+                <ChessHistory
+                    backwardCb={backwardCb}
+                    forwardCb={forwardCb}
+                    fastBackwardCb={fastBackwardCb}
+                    fastForwardCb={fastForwardCb}
+                />
+            </> :
+            <InGameOptions resetCb={resetCb} />
         }
     </div>;
 };

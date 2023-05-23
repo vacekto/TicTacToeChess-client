@@ -28,9 +28,6 @@ function App() {
   useEffect(() => {
     registerDragToScroll()
     subscribeToSocketEvents(socketProxy, updateGlobalState, handleNewInvite)
-    socketProxy.on('disconnect', () => {
-      navigate('/')
-    })
 
     socketProxy.emit('fetch_online_users')
 
@@ -44,14 +41,8 @@ function App() {
     navigate(`/${gameName}`)
   }, [gameName])
 
-
-  const test = () => {
-    console.log('hahaha')
-  }
-
   return (
     <div className="App" id={theme}>
-      {/* <div className='customButton' onClick={test} draggable onDragStart={() => console.log('cosikdesi')}>test</div> */}
       <InvitationNotificationss />
       <UsernameModal />
       <Routes>
