@@ -1,7 +1,7 @@
 import './TicTacToe.scss'
 import { useReducer, useContext, useEffect } from 'react'
 import { context } from '@/context/GlobalStateProvider'
-import { TTicTacToeSide, ITicTacToeState } from 'shared'
+import { TTicTacToeSide, ITicTacToeState, getMoveSuggestion } from 'shared'
 import InGameOptions from '@/components/InGameOptions';
 import InGameScore from '@/components/InGameScore';
 import InGameUsername from '@/components/InGameUsername'
@@ -99,8 +99,29 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
     }
   }, [])
 
+  const test = () => {
+    getMoveSuggestion(gameInstance.state.board, gameInstance.state.activePlayer)
+    // console.log(gameInstance.state)
+  }
+
+  const testSides = () => {
+    console.log(gameSide, gameInstance.state.activePlayer)
+  }
+
+  const revert = () => {
+    console.log(gameInstance.state.board)
+    gameInstance.revert()
+    console.log(gameInstance.state.board)
+    dispatch({ type: 'STATE_UPDATE', payload: { state: gameInstance.state as ITicTacToeState } })
+    updateGlobalState({
+      gameSide: gameSide === 'O' ? 'X' : 'O'
+    })
+  }
 
   return <div className='TicTacToe'>
+    <button onClick={test}>test</button>
+    <button onClick={testSides}>testSides</button>
+    <button onClick={revert}>revert</button>
     <SelectSideModal />
     <InGameUsername username={username} opponentUsername={opponentUsername} />
     <InGameScore score={state.score} />

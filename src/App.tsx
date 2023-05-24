@@ -14,6 +14,7 @@ import {
 } from './util/functions'
 import { socketProxy } from '@/util/socketSingleton'
 import InvitationNotificationss from './components/InvitationNotifications';
+import { getMoveSuggestion } from 'shared';
 
 function App() {
   const navigate = useNavigate()
@@ -40,6 +41,13 @@ function App() {
   useEffect(() => {
     navigate(`/${gameName}`)
   }, [gameName])
+
+  const test = () => {
+    const board = [[null, null, null], [null, null, null], [null, null, null]]
+    const activePlayer = 'O'
+
+    getMoveSuggestion(board, activePlayer)
+  }
 
   return (
     <div className="App" id={theme}>

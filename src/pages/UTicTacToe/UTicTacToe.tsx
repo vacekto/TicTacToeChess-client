@@ -107,7 +107,6 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
     useEffect(() => {
 
         socketProxy.on('game_state_update', (state) => {
-            console.log(state)
             gameInstance.updateState(state as IUTicTacToeState)
             dispatch({ type: 'STATE_UPDATE', payload: { state: state as IUTicTacToeState } })
         })
