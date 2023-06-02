@@ -1,6 +1,6 @@
 import './Chess.scss'
-import { useReducer, useContext, useEffect, MouseEvent, useState } from 'react';
-import { IChessMove, IChessState, TChessPiece } from 'shared';
+import { useReducer, useContext, useEffect, MouseEvent, useState, useRef } from 'react';
+import { IChessMove, IChessState, TChessPiece, TGameSide } from 'shared';
 import InGameOptions from '@/components/InGameOptions';
 import InGameUsername from '@/components/InGameUsername';
 import { context } from '@/context/GlobalStateProvider'
@@ -12,6 +12,7 @@ import SelectSideModal from '@/components/modals/SelectSideModal';
 import ChessPiece from '@/util/svg/components/ChessPiece'
 import useChess from './useChess';
 import Winner from '@/components/Winner';
+const jsChessEngine = require('js-chess-engine')
 
 interface IDragData {
     elementRef: SVGSVGElement
@@ -19,18 +20,20 @@ interface IDragData {
     currentSquare: [number, number]
 }
 
-
 const Chess: React.FC = () => {
     const {
         username,
-        gameMode,
         gameSide,
         opponentUsername,
         updateGlobalState,
-        leaveGame
+        leaveGame,
+        gameMode,
+        startingSide
     } = useContext(context)
 
     const gameInstance = useChess()
+    const vsPCInstance = useRef(new jsChessEngine.Game())
+
     const [flipped, setFlipped] = useState<boolean>(false)
     const [showLastMove, setShowLastMove] = useState<boolean>(true)
     const [dragData, setDragData] = useState<IDragData | null>(null)
@@ -39,6 +42,24 @@ const Chess: React.FC = () => {
         selected: null,
         potentialMoves: []
     })
+
+
+    const PCMove = () => {
+        setTimeout(() => {
+            const playedMove = vsPCInstance.current.aiMove(3)
+            const fromConventional = Object.keys(playedMove)[0]
+            const from = convertCoord.conventionalToNumeric(fromConventional)
+            const to = convertCoord.conventionalToNumeric(playedMove[fromConventional])
+            const move: IChessMove = { from, to }
+            gameInstance.move(move)
+            const newState = gameInstance.state
+            dispatch({
+                type: 'STATE_UPDATE',
+                payload: { state: newState }
+            })
+        }, 500);
+    }
+
 
     const isInPotentialMoves = (X: number, Y: number) => {
         for (const [A, B] of state.potentialMoves) {
@@ -68,14 +89,21 @@ const Chess: React.FC = () => {
 
     const resetCb = () => {
         gameInstance.resetState()
+        vsPCInstance.current = new jsChessEngine.Game()
+
         const state = gameInstance.state as IChessState
+        let side: TGameSide = 'w'
+        if (gameMode === 'vsPC')
+            side = startingSide === 'b' ? 'w' : 'b'
+
         updateGlobalState({
-            gameSide: 'w'
+            gameSide: side,
+            startingSide: side
         })
-        dispatch({
-            type: 'STATE_UPDATE',
-            payload: { state }
-        })
+
+        dispatch({ type: 'STATE_UPDATE', payload: { state } })
+        if (side === 'b' && gameMode === 'vsPC')
+            PCMove()
     }
 
     const forwardCb = () => {
@@ -102,6 +130,21 @@ const Chess: React.FC = () => {
         dispatch({ type: 'STATE_UPDATE', payload: { state } })
     }
 
+
+    const convertCoord = (() => {
+        const boardLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+
+        return {
+            numericToConventional: ([X, Y]: [number, number]) => {
+                return (boardLetters[Y] + String(7 - X + 1))
+            },
+
+            conventionalToNumeric: (pos: string) => {
+                return [7 - (+pos[1] - 1), boardLetters.indexOf(pos[0])] as [number, number]
+            }
+
+        }
+    })()
 
     const sortPieces = ((pieceA: TChessPiece, pieceB: TChessPiece) => {
         const sortValues = {
@@ -188,6 +231,11 @@ const Chess: React.FC = () => {
             }
 
             gameInstance.move(move)
+            if (gameMode === 'vsPC') {
+                const from = convertCoord.numericToConventional(move.from)
+                const to = convertCoord.numericToConventional(move.to)
+                vsPCInstance.current.move(from, to)
+            }
 
             const stateUpdate = gameInstance.state
 
@@ -232,10 +280,13 @@ const Chess: React.FC = () => {
         if (dragData?.currentSquare && state.selected) {
             const [A, B] = dragData.currentSquare
             if (isInPotentialMoves(A, B)) {
-                const from = [X, Y]
-                const to = [A, B]
-                const move = { from, to } as IChessMove
+                const move = { from: [X, Y], to: [A, B] } as IChessMove
                 gameInstance.move(move)
+                if (gameMode === 'vsPC') {
+                    const from = convertCoord.numericToConventional(move.from)
+                    const to = convertCoord.numericToConventional(move.to)
+                    vsPCInstance.current.move(from, to)
+                }
                 const state = gameInstance.state
                 dispatch({
                     type: 'STATE_UPDATE',
@@ -286,6 +337,22 @@ const Chess: React.FC = () => {
     }
 
     useEffect(() => {
+        let timeoutId: NodeJS.Timeout
+        if (
+            gameMode === 'vsPC' &&
+            state.activePlayer !== gameSide &&
+            !state.winner
+        ) {
+            timeoutId = setTimeout(PCMove, 200);
+        }
+
+        return () => {
+            clearTimeout(timeoutId)
+        }
+
+    }, [state.activePlayer])
+
+    useEffect(() => {
 
         socketProxy.on('game_state_update', (state) => {
             gameInstance.updateState(state as IChessState, true)
@@ -304,9 +371,18 @@ const Chess: React.FC = () => {
 
     }, [])
 
+    const test = () => {
+        // console.log(gameInstance.convertCoord.numericToConventional([5, 4]))
+
+        const FEN = gameInstance.getFEN()
+        console.log(FEN)
+
+    }
+
     return <div className='Chess'>
         <SelectSideModal />
         <InGameUsername username={username} opponentUsername={opponentUsername} />
+        <button onClick={test}>test</button>
         <div className="boardContainer">
 
             <div className="piecesTakenWhite">

@@ -93,7 +93,7 @@ const SelectSideModal: React.FC<ISelectSideModalProps> = () => {
             <ThreeDots />
         </>
 
-        return <h2 >You play as</h2>
+        return <h2>You play as</h2>
     }
 
 

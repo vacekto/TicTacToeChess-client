@@ -14,11 +14,13 @@ import Winner from '@/components/Winner';
 import {
     IUTicTacToeState,
     TTicTacToeSide,
+    suggestUTicTacToeMove
 } from 'shared';
 import useUTicTacToe from './useUTicTacToe';
 import {
     useReducer,
 } from 'react'
+import { IGlobalState } from '@/context/globalReducer';
 
 interface ITicTacToeProps {
 
@@ -29,11 +31,15 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
         username,
         opponentUsername,
         gameSide,
-        leaveGame
+        leaveGame,
+        gameMode,
+        updateGlobalState,
+        startingSide
     } = useContext(context)
 
 
     const gameInstance = useUTicTacToe()
+
     const [state, dispatch] = useReducer(reducer, {
         ...gameInstance.state,
         score: {
@@ -61,9 +67,15 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
     }
 
     const resetCb = () => {
-        gameInstance.resetState()
+        gameInstance.resetState(startingSide === 'O' ? 'X' : 'O')
         const stateUpdate = gameInstance.state
         dispatch({ type: 'STATE_RESET', payload: { state: stateUpdate } })
+
+        const globalStateUpdate: Partial<IGlobalState> = {}
+        globalStateUpdate.startingSide = startingSide === 'O' ? 'X' : 'O'
+        if (gameMode === 'hotseat')
+            globalStateUpdate.gameSide = startingSide === 'O' ? 'X' : 'O'
+        updateGlobalState(globalStateUpdate)
     }
 
     const setSquareStyleClass = (X: number, Y: number) => {
@@ -81,6 +93,8 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
         return ''
     }
 
+
+
     const handleClick = (
         SX: number, SY: number, X: number, Y: number
     ) => () => {
@@ -94,6 +108,9 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
 
         const move = { SX, SY, X, Y }
         gameInstance.move(move)
+        if (gameMode === 'vsPC') {
+
+        }
         const stateUpdate = gameInstance.state
         dispatch({ type: 'STATE_UPDATE', payload: { state: stateUpdate } })
     }
@@ -105,6 +122,36 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
     }
 
     useEffect(() => {
+        if (
+            gameMode !== 'vsPC' ||
+            gameSide === state.activePlayer
+        )
+            return
+
+
+        setTimeout(() => {
+            const move = suggestUTicTacToeMove(
+                state.board,
+                state.activeSegment,
+                state.activePlayer,
+                state.segmentBoard
+            )
+
+            gameInstance.move(move)
+
+            const newState = gameInstance.state
+            dispatch({ type: 'STATE_UPDATE', payload: { state: newState } })
+
+        }, 1000)
+
+    }, [state.activePlayer])
+
+    useEffect(() => {
+
+        updateGlobalState({
+            startingSide: gameInstance.state.activePlayer
+        })
+
 
         socketProxy.on('game_state_update', (state) => {
             gameInstance.updateState(state as IUTicTacToeState)
@@ -118,6 +165,7 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
             socketProxy.removeListener('leave_game')
         }
     }, [])
+
 
     return <div className='UTicTacToe'>
         <SelectSideModal />

@@ -74,6 +74,8 @@ const ContextProvider: React.FC<IContextProviderProps> = ({ children }) => {
             opponentUsername: '',
             ticTacToeBoardSize: undefined,
             ticTacToeWinCondition: undefined,
+            startingSide: undefined,
+            chessDfficulty: undefined
         })
     }
 

@@ -29,7 +29,6 @@ const GenericSelectDecorator: TGenericSelectDecorator = (props) => {
     >
         {props.children}
     </GenericSelect>
-
 }
 
 export default GenericSelectDecorator

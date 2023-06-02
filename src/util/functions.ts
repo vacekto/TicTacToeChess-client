@@ -138,3 +138,15 @@ export const handleMenuResize = (element: HTMLDivElement) => {
     observer.observe(element)
 }
 
+export const addDelay = (cb: Function, ms: number) => {
+
+    const cbProxy = new Proxy(cb, {
+        apply(target, thisArg, args) {
+            const delay = ''
+
+            return Reflect.apply(target, thisArg, args)
+        }
+    })
+
+
+}

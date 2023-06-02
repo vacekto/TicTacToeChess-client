@@ -14,7 +14,8 @@ const UsernameModal: React.FC<ITopBarProps> = () => {
     const [focused, setFocused] = useState<Boolean>(false)
     const {
         updateGlobalState,
-        showUsernameModal
+        showUsernameModal,
+        usernameErrorMsg
     } = useContext(context)
 
 
@@ -49,6 +50,15 @@ const UsernameModal: React.FC<ITopBarProps> = () => {
             return prevState === true ? false : true
         })
     }
+
+    useEffect(() => {
+        if (!usernameErrorMsg) return
+        setTimeout(() => {
+            updateGlobalState({
+                usernameErrorMsg: undefined
+            })
+        }, 5000)
+    }, [usernameErrorMsg])
 
     useEffect(() => {
         usernameInputRef.current.addEventListener('focusin', () => {
@@ -93,7 +103,9 @@ const UsernameModal: React.FC<ITopBarProps> = () => {
                 >
                     <Checkbox />
                 </div>
-
+                <div className="errorMessage">
+                    <h4>{usernameErrorMsg}</h4>
+                </div>
             </div>
             <div className="buttonContainer">
                 <button className='customButton' onClick={handleSubmit}>Submit</button>

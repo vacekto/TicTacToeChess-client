@@ -11,7 +11,8 @@ import { handleMenuResize } from '@/util/functions';
 import ThreeDots from '@/components/ThreeDots';
 import TicTacToeHotseatModal from '@/components/modals/TicTacToeHotseatModal';
 import { IGlobalState } from '@/context/globalReducer';
-
+import TicTacToeVsPCModal from '@/components/modals/TicTacToeVsPCModal';
+import ChessVsPCModal from '@/components/modals/ChessVsPCModal';
 
 interface IOptionsProps {
     setActiveSideBar: React.Dispatch<React.SetStateAction<"gameInvites" | "usersOnline" | null>>
@@ -29,17 +30,29 @@ const Options: React.FC<IOptionsProps> = ({ activeSideBar }) => {
     }
 
     const handleHotseat = () => {
-        if (selectedGame === 'ticTacToe') {
-            updateGlobalState({
-                gameMode: 'hotseat'
-            })
-            return
+        const state: Partial<IGlobalState> = {}
+        state.gameMode = 'hotseat'
+
+        if (
+            selectedGame === 'uTicTacToe' ||
+            selectedGame === 'chess'
+        ) {
+            state.gameName = selectedGame
+            state.gameSide = selectedGame === 'chess' ? 'w' : 'O'
+            state.startingSide = selectedGame === 'chess' ? 'w' : 'O'
         }
-        const gameSide = selectedGame === 'chess' ? 'w' : 'O'
-        const state: Partial<IGlobalState> = {
-            gameMode: 'hotseat',
-            gameName: selectedGame,
-            gameSide
+
+        updateGlobalState(state)
+    }
+
+    const handleVsPC = () => {
+        const state: Partial<IGlobalState> = {}
+        state.gameMode = 'vsPC'
+
+        if (selectedGame === 'uTicTacToe') {
+            state.gameName = 'uTicTacToe'
+            state.gameSide = 'O'
+            state.startingSide = 'O'
         }
 
         updateGlobalState(state)
@@ -76,6 +89,17 @@ const Options: React.FC<IOptionsProps> = ({ activeSideBar }) => {
             visible={selectedGame === 'ticTacToe' && gameMode === 'hotseat'}
             exitModal={() => { updateGlobalState({ gameMode: '' }) }}
         />
+        <TicTacToeVsPCModal
+            visible={selectedGame === 'ticTacToe' && gameMode === 'vsPC'}
+            exitModal={() => { updateGlobalState({ gameMode: '' }) }}
+
+        />
+        <ChessVsPCModal
+            visible={selectedGame === 'chess' && gameMode === 'vsPC'}
+            exitModal={() => { updateGlobalState({ gameMode: '' }) }}
+
+        />
+
         <SideBar activeSideBar={activeSideBar} />
         <div className="listAndOptions" ref={gameListRef}>
             {!selectedGame ?
@@ -122,7 +146,7 @@ const Options: React.FC<IOptionsProps> = ({ activeSideBar }) => {
 
                             }
                         </button>
-                        <button className='customButton'>vs PC</button>
+                        <button className='customButton' onClick={handleVsPC}>vs PC</button>
                         <button className='customButton' onClick={selectGame('')}>Back to menu</button>
                     </div>
                 </div>

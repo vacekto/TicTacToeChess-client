@@ -26,6 +26,8 @@ export interface IGlobalState {
     activeGenericSelectId: string,
     ticTacToeBoardSize?: number
     ticTacToeWinCondition?: number
+    startingSide?: TGameSide,
+    chessDfficulty?: number
 };
 
 export type TGlobalStateAction =

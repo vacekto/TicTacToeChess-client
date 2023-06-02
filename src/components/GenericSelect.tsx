@@ -20,9 +20,14 @@ export interface IExtendState {
     componentId: string
 }
 
+type TSelectCb = (options: {
+    index: number,
+    item: ReactNode
+}) => void
+
 export interface IGenericSelectProps {
     options: ReactNode[],
-    selectCallback?: (selectedOption: ISelectedOption) => void,
+    selectCallback?: TSelectCb,
     extendCallback?: (componentState: IExtendState) => void,
     activeGenericSelectId?: string,
     defaultDescription?: string,
@@ -78,6 +83,11 @@ const GenericSelect: React.FC<IGenericSelectProps> = ({
         setRenderedOptions(options)
     }, [options])
 
+
+    useEffect(() => {
+        if (renderedOptions.length <= indexOfSelected)
+            setIndexOfSelected(-1)
+    }, [renderedOptions])
 
     useEffect(() => {
         if (!children) return

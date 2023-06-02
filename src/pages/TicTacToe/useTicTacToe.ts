@@ -1,6 +1,6 @@
 import { useRef, useContext } from "react"
 import { context } from "@/context/GlobalStateProvider"
-import { TicTacToeGame, ITicTacToeMove, TTicTacToeSide } from "shared"
+import { TicTacToeGame, ITicTacToeMove, TTicTacToeSide, suggestTicTacToeMove } from "shared"
 import { socketProxy } from "@/util/socketSingleton"
 
 const useTicTacToe = () => {
@@ -44,7 +44,6 @@ const useTicTacToe = () => {
     })
 
     return isntanceProxy
-
 }
 
 export default useTicTacToe

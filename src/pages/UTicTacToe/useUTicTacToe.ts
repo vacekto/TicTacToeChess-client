@@ -1,6 +1,6 @@
 import { useRef, useContext } from "react"
 import { context } from "@/context/GlobalStateProvider"
-import { UTicTacToeGame, IUTicTacToeMove } from "shared"
+import { UTicTacToeGame, IUTicTacToeMove, TTicTacToeSide } from "shared"
 import { socketProxy } from "@/util/socketSingleton"
 
 const useUTicTacToe = () => {
@@ -11,7 +11,7 @@ const useUTicTacToe = () => {
     } = useContext(context)
 
 
-    const instance = useRef(new UTicTacToeGame())
+    const instance = useRef(new UTicTacToeGame(gameSide ? gameSide as TTicTacToeSide : undefined))
 
     const moveProxy = new Proxy(instance.current.move, {
         apply(target, thisArg, args) {

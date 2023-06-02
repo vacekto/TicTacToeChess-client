@@ -1,7 +1,7 @@
 import './TicTacToe.scss'
 import { useReducer, useContext, useEffect } from 'react'
 import { context } from '@/context/GlobalStateProvider'
-import { TTicTacToeSide, ITicTacToeState, getMoveSuggestion } from 'shared'
+import { TTicTacToeSide, ITicTacToeState, suggestTicTacToeMove, ITicTacToeAIMoveProps, ITicTacToeMove } from 'shared'
 import InGameOptions from '@/components/InGameOptions';
 import InGameScore from '@/components/InGameScore';
 import InGameUsername from '@/components/InGameUsername'
@@ -13,6 +13,8 @@ import reducer from './reducer'
 import useTicTacToe from './useTicTacToe'
 import SelectSideModal from '@/components/modals/SelectSideModal';
 import Winner from '@/components/Winner'
+import { IGlobalState } from '@/context/globalReducer';
+const worker = new Worker(new URL('./ticTacToeWorker.ts', import.meta.url))
 
 interface ITicTacToeProps {
 
@@ -25,8 +27,11 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
     opponentUsername,
     gameSide,
     updateGlobalState,
-    leaveGame
+    leaveGame,
+    ticTacToeWinCondition,
+    startingSide
   } = useContext(context)
+
 
   const gameInstance = useTicTacToe()
 
@@ -40,6 +45,7 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
   })
 
   const handleClick = (X: number, Y: number) => () => {
+
     if (
       state.board[X][Y] ||
       state.winner ||
@@ -56,6 +62,8 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
       type: 'STATE_UPDATE',
       payload: { state: stateUpdate }
     })
+
+
   }
 
   const renderIcon = (value: TTicTacToeSide | null | 'draw') => {
@@ -72,17 +80,60 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
   }
 
   const resetCb = () => {
-    gameInstance.resetState()
+    const newStartingSide = startingSide === 'O' ? 'X' : 'O'
+    gameInstance.resetState(newStartingSide)
     const stateUpdate = gameInstance.state
     dispatch({ type: 'STATE_UPDATE', payload: { state: stateUpdate } })
-    if (gameMode !== 'hotseat') return
-    const gameSide = gameInstance.state.activePlayer
-    updateGlobalState({ gameSide })
+    const globalStateUpdate: Partial<IGlobalState> = {}
+    globalStateUpdate.startingSide = newStartingSide
+    if (gameMode === 'hotseat')
+      globalStateUpdate.gameSide = newStartingSide
+    updateGlobalState(globalStateUpdate)
   }
 
+  useEffect(() => {
+    if (
+      state.activePlayer === gameSide ||
+      gameMode !== 'vsPC' ||
+      state.winner
+    )
+      return
 
+    // const move = suggestTicTacToeMove({
+    //   board: gameInstance.state.board,
+    //   activePlayer: gameInstance.state.activePlayer,
+    //   winCondition: ticTacToeWinCondition,
+    //   skill: 3
+    // }
+    // )
+
+    // gameInstance.move(move)
+
+    worker.postMessage({
+      board: gameInstance.state.board,
+      activePlayer: gameInstance.state.activePlayer,
+      winCondition: ticTacToeWinCondition,
+      skill: 3
+    })
+
+
+    // const newState = gameInstance.state
+    // dispatch({ type: 'STATE_UPDATE', payload: { state: newState } })
+
+  }, [state.activePlayer])
 
   useEffect(() => {
+
+    worker.onmessage = (msg) => {
+      const move = msg.data as ITicTacToeMove
+      gameInstance.move(move)
+      const newState = gameInstance.state
+      dispatch({ type: 'STATE_UPDATE', payload: { state: newState } })
+    }
+
+    updateGlobalState({
+      startingSide: gameInstance.state.activePlayer
+    })
 
     if (gameMode !== 'multiplayer') return
 
@@ -100,31 +151,31 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
   }, [])
 
   const test = () => {
-    getMoveSuggestion(gameInstance.state.board, gameInstance.state.activePlayer)
-    // console.log(gameInstance.state)
-  }
+    // const gameState = {
+    //   board: gameInstance.state.board,
+    //   activePlayer: gameInstance.state.activePlayer,
+    //   winCondition: ticTacToeWinCondition,
+    //   difficulty: 3
+    // }
+    // fetch('http://localhost:3001', {
+    //   method: 'POST',
+    //   body: JSON.stringify(gameState)
+    // })
 
-  const testSides = () => {
-    console.log(gameSide, gameInstance.state.activePlayer)
-  }
-
-  const revert = () => {
-    console.log(gameInstance.state.board)
-    gameInstance.revert()
-    console.log(gameInstance.state.board)
-    dispatch({ type: 'STATE_UPDATE', payload: { state: gameInstance.state as ITicTacToeState } })
-    updateGlobalState({
-      gameSide: gameSide === 'O' ? 'X' : 'O'
+    worker.postMessage({
+      board: gameInstance.state.board,
+      activePlayer: gameInstance.state.activePlayer,
+      winCondition: ticTacToeWinCondition,
+      skill: 3
     })
+
   }
 
   return <div className='TicTacToe'>
-    <button onClick={test}>test</button>
-    <button onClick={testSides}>testSides</button>
-    <button onClick={revert}>revert</button>
     <SelectSideModal />
     <InGameUsername username={username} opponentUsername={opponentUsername} />
     <InGameScore score={state.score} />
+    <button onClick={test}>test</button>
     <div className="board">
       {state.board.map((row, X) => <div key={X}>
         {row.map((square, Y) => <div
