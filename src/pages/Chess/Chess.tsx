@@ -13,6 +13,7 @@ import ChessPiece from '@/util/svg/components/ChessPiece'
 import useChess from './useChess';
 import Winner from '@/components/Winner';
 const jsChessEngine = require('js-chess-engine')
+const worker = new Worker(new URL('./chessWorker.ts', import.meta.url))
 
 interface IDragData {
     elementRef: SVGSVGElement
@@ -45,19 +46,26 @@ const Chess: React.FC = () => {
 
 
     const PCMove = () => {
-        setTimeout(() => {
-            const playedMove = vsPCInstance.current.aiMove(3)
-            const fromConventional = Object.keys(playedMove)[0]
-            const from = convertCoord.conventionalToNumeric(fromConventional)
-            const to = convertCoord.conventionalToNumeric(playedMove[fromConventional])
-            const move: IChessMove = { from, to }
-            gameInstance.move(move)
-            const newState = gameInstance.state
-            dispatch({
-                type: 'STATE_UPDATE',
-                payload: { state: newState }
-            })
-        }, 500);
+
+        const fen = gameInstance.getFEN()
+        worker.postMessage(fen)
+
+        // setTimeout(() => {
+
+
+
+        //     const playedMove = vsPCInstance.current.aiMove(3)
+        //     const fromConventional = Object.keys(playedMove)[0]
+        //     const from = convertCoord.conventionalToNumeric(fromConventional)
+        //     const to = convertCoord.conventionalToNumeric(playedMove[fromConventional])
+        //     const move: IChessMove = { from, to }
+        //     gameInstance.move(move)
+        //     const newState = gameInstance.state
+        //     dispatch({
+        //         type: 'STATE_UPDATE',
+        //         payload: { state: newState }
+        //     })
+        // }, 500);
     }
 
 
@@ -231,6 +239,7 @@ const Chess: React.FC = () => {
             }
 
             gameInstance.move(move)
+
             if (gameMode === 'vsPC') {
                 const from = convertCoord.numericToConventional(move.from)
                 const to = convertCoord.numericToConventional(move.to)
@@ -337,22 +346,37 @@ const Chess: React.FC = () => {
     }
 
     useEffect(() => {
-        let timeoutId: NodeJS.Timeout
         if (
-            gameMode === 'vsPC' &&
-            state.activePlayer !== gameSide &&
-            !state.winner
-        ) {
-            timeoutId = setTimeout(PCMove, 200);
-        }
+            gameMode !== 'vsPC' ||
+            gameSide === state.activePlayer ||
+            state.winner
+        )
+            return
 
-        return () => {
-            clearTimeout(timeoutId)
-        }
+        const fen = gameInstance.getFEN()
+        worker.postMessage(fen)
 
     }, [state.activePlayer])
 
     useEffect(() => {
+
+        worker.onmessage = (msg) => {
+            const playedMoveInConv = msg.data as { [key: string]: string }
+            const fromConventional = Object.keys(playedMoveInConv)[0]
+            const toConventional = playedMoveInConv[fromConventional]
+            const fromNumeric = convertCoord.conventionalToNumeric(fromConventional)
+            const toNumeric = convertCoord.conventionalToNumeric(toConventional)
+            const move: IChessMove = { from: fromNumeric, to: toNumeric }
+            gameInstance.move(move)
+            vsPCInstance.current.move(fromConventional, toConventional)
+            const newState = gameInstance.state
+            dispatch({
+                type: 'STATE_UPDATE',
+                payload: { state: newState }
+            })
+        }
+
+
 
         socketProxy.on('game_state_update', (state) => {
             gameInstance.updateState(state as IChessState, true)
@@ -371,12 +395,10 @@ const Chess: React.FC = () => {
 
     }, [])
 
+
     const test = () => {
-        // console.log(gameInstance.convertCoord.numericToConventional([5, 4]))
-
-        const FEN = gameInstance.getFEN()
-        console.log(FEN)
-
+        const fen = gameInstance.getFEN()
+        console.log(fen)
     }
 
     return <div className='Chess'>

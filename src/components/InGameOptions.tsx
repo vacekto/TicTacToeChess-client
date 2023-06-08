@@ -34,9 +34,9 @@ const InGameOptions: React.FC<IInGameOptionsProps> = ({
           <Repeat />
         </div>
     }
-    <div onClick={switchLightTheme}>
+    {/* <div onClick={switchLightTheme}>
       <LightMode />
-    </div>
+    </div> */}
   </div>;
 };
 

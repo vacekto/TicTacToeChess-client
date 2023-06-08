@@ -108,7 +108,6 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
     // )
 
     // gameInstance.move(move)
-
     worker.postMessage({
       board: gameInstance.state.board,
       activePlayer: gameInstance.state.activePlayer,
@@ -151,23 +150,23 @@ const TicTacToe: React.FC<ITicTacToeProps> = () => {
   }, [])
 
   const test = () => {
-    // const gameState = {
-    //   board: gameInstance.state.board,
-    //   activePlayer: gameInstance.state.activePlayer,
-    //   winCondition: ticTacToeWinCondition,
-    //   difficulty: 3
-    // }
-    // fetch('http://localhost:3001', {
-    //   method: 'POST',
-    //   body: JSON.stringify(gameState)
-    // })
-
-    worker.postMessage({
+    const start = Date.now()
+    const move = suggestTicTacToeMove({
       board: gameInstance.state.board,
       activePlayer: gameInstance.state.activePlayer,
       winCondition: ticTacToeWinCondition,
       skill: 3
     })
+    const end = Date.now()
+    console.log((end - start) / 1000)
+
+
+    // worker.postMessage({
+    //   board: gameInstance.state.board,
+    //   activePlayer: gameInstance.state.activePlayer,
+    //   winCondition: ticTacToeWinCondition,
+    //   skill: 3
+    // })
 
   }
 

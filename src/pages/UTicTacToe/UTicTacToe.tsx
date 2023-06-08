@@ -12,15 +12,16 @@ import { socketProxy } from '@/util/socketSingleton';
 import SelectSideModal from '@/components/modals/SelectSideModal';
 import Winner from '@/components/Winner';
 import {
+    IUTicTacToeMove,
     IUTicTacToeState,
     TTicTacToeSide,
-    suggestUTicTacToeMove
 } from 'shared';
 import useUTicTacToe from './useUTicTacToe';
 import {
     useReducer,
 } from 'react'
 import { IGlobalState } from '@/context/globalReducer';
+const worker = new Worker(new URL('./uTicTacToeWorker.ts', import.meta.url))
 
 interface ITicTacToeProps {
 
@@ -108,9 +109,6 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
 
         const move = { SX, SY, X, Y }
         gameInstance.move(move)
-        if (gameMode === 'vsPC') {
-
-        }
         const stateUpdate = gameInstance.state
         dispatch({ type: 'STATE_UPDATE', payload: { state: stateUpdate } })
     }
@@ -124,29 +122,28 @@ const UTicTacToe: React.FC<ITicTacToeProps> = () => {
     useEffect(() => {
         if (
             gameMode !== 'vsPC' ||
-            gameSide === state.activePlayer
+            gameSide === state.activePlayer ||
+            state.winner
         )
             return
 
-
-        setTimeout(() => {
-            const move = suggestUTicTacToeMove(
-                state.board,
-                state.activeSegment,
-                state.activePlayer,
-                state.segmentBoard
-            )
-
-            gameInstance.move(move)
-
-            const newState = gameInstance.state
-            dispatch({ type: 'STATE_UPDATE', payload: { state: newState } })
-
-        }, 1000)
+        worker.postMessage({
+            board: state.board,
+            activeSegment: state.activeSegment,
+            activePlayer: state.activePlayer,
+            segmentBoard: state.segmentBoard
+        })
 
     }, [state.activePlayer])
 
     useEffect(() => {
+
+        worker.onmessage = (msg) => {
+            const move = msg.data as IUTicTacToeMove
+            gameInstance.move(move)
+            const newState = gameInstance.state
+            dispatch({ type: 'STATE_UPDATE', payload: { state: newState } })
+        }
 
         updateGlobalState({
             startingSide: gameInstance.state.activePlayer

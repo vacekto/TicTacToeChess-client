@@ -1,10 +1,8 @@
-import { suggestTicTacToeMove, ITicTacToeAIMoveProps } from 'shared'
-
+import { suggestUTicTacToeMove, IUTicTacToeAIMoveProps } from 'shared'
+const { aiMove } = require('js-chess-engine')
 
 onmessage = (msg) => {
-
-    const props = msg.data as ITicTacToeAIMoveProps
-    props.skill = 3
+    const fen = msg.data as IUTicTacToeAIMoveProps
     let runCb = false
     let move: any = null
 
@@ -13,7 +11,8 @@ onmessage = (msg) => {
     }, 1000)
 
     const start = Date.now()
-    move = suggestTicTacToeMove(props)
+    move = aiMove(fen, 3)
+
     const end = Date.now()
     const elapsedMS = (end - start)
 

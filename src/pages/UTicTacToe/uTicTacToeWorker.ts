@@ -1,10 +1,9 @@
-import { suggestTicTacToeMove, ITicTacToeAIMoveProps } from 'shared'
+import { suggestUTicTacToeMove, IUTicTacToeAIMoveProps } from 'shared'
 
 
 onmessage = (msg) => {
 
-    const props = msg.data as ITicTacToeAIMoveProps
-    props.skill = 3
+    const props = msg.data as IUTicTacToeAIMoveProps
     let runCb = false
     let move: any = null
 
@@ -13,7 +12,7 @@ onmessage = (msg) => {
     }, 1000)
 
     const start = Date.now()
-    move = suggestTicTacToeMove(props)
+    move = suggestUTicTacToeMove(props)
     const end = Date.now()
     const elapsedMS = (end - start)
 
