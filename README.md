@@ -1,46 +1,16 @@
-# Getting Started with Create React App
+deployed here: https://tictactoechess.onrender.com/
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# About
+This is simple game platform for chess, tic tac toe and ultimate tic tac toe. You can play by yourself in hotseat mode, chalange your friend to a game or even test your skill against computer. The AI however was not focus of this project and so has much room for improvement, more on that later. If you are not familiar with ultimate tic tac toe, it is simply put tic tac toe within tic tac toe, where your every move determins wherever your opponent can play next. You can read up more on rules [here](https://www.thegamegal.com/2018/09/01/ultimate-tic-tac-toe/).
 
-## Available Scripts
+# Dev stack
+- React
+- express
+- (socket.io)[https://socket.io/]
+- typescript
+- Sass
 
-In the project directory, you can run:
+game logic is written without any third party libraries in (TicTacToeChess-shared)[https://github.com/vacekto/TicTacToeChess-shared] repo.
 
-### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+# Ai
+The Ai for tic tac toe uses (minimax algorithm)[https://www.javatpoint.com/mini-max-algorithm-in-ai] with (alpha-beta pruning)[https://www.javatpoint.com/ai-alpha-beta-pruning] optimalization to determine best next move. This was however motivated more by curiosity then practicality and has some sevire flaws that are so far left unaddressed. The evaluation function simply rewards longer streak for each opponent, which would suffice with enough processing power, but that is obviously unreasonable demand for client. Ultimate tic tac toe uses this algorithm in case when next game field is determined, otherwise it first randomly selects next game field. Chess uses third pary package (js-chess-engine)[https://github.com/josefjadrny/js-chess-engine] for ai, but uses game logic implemented in shared repo.
